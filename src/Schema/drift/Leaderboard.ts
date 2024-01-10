@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { IDriver } from "./Driver";
 
 export enum DriftSerie {
   dmec = "dmec",
 }
 
 export interface ScoreboardItem {
-  driverId: string;
+  driver: IDriver;
   score: number;
   numOfWins: number;
   numOfSeconds: number;

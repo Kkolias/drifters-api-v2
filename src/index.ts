@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
 
 import userRouter from './routes/user.routes'
-import mongoose from "mongoose";
+import driverRouter from './routes/driver.routes'
+import leaderboardRouter from './routes/leaderboard.routes'
 
 const app = express();
 const port = 8000;
@@ -28,6 +30,8 @@ app.use(bodyParser.json());
 
 //ROUTES
 app.use('/user', userRouter)
+app.use('/driver', driverRouter)
+app.use('/leaderboard', leaderboardRouter)
 
 
 // MONGODB SETUP
