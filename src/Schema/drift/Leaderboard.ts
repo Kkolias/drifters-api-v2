@@ -25,7 +25,11 @@ const LeaderboardSchema = new Schema<ILeaderboard>({
   createdAt: { type: Date, default: () => Date.now() },
   scoreboard: [
     {
-      driverId: { type: String, required: true },
+      driver: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Driver",
+        required: true
+      },
       score: { type: Number, default: 0 },
       numOfWins: { type: Number, default: 0 },
       numOfSeconds: { type: Number, default: 0 },

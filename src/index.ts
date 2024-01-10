@@ -1,6 +1,9 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 
+import userRouter from './routes/user.routes'
+import mongoose from "mongoose";
+
 const app = express();
 const port = 8000;
 
@@ -23,6 +26,14 @@ const corsOptions = {
 app.use(cors());
 app.use(bodyParser.json());
 
+//ROUTES
+app.use('/user', userRouter)
+
+
+// MONGODB SETUP
+const mongoUrl = "mongodb://admin:password@localhost:27018/?authMechanism=DEFAULT"
+// const mongoUrl = `mongodb://localhost:27017`; // dev
+mongoose.connect(mongoUrl, { dbName: "drifters-db" });
 
 
 
