@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { DriftSerie } from "./Leaderboard";
+import { DriftSerie, ILeaderboard } from "./Leaderboard";
 import { IDriftEventSchema } from "./DriftEvent";
 import { IDriver } from "./Driver";
 
@@ -9,6 +9,7 @@ export interface IDriftSeason extends Document {
   year: number;
   driftEvents: IDriftEventSchema[];
   driversOfSeason: IDriver[];
+  leaderboard: ILeaderboard;
   createdAt: Date;
 }
 
@@ -30,6 +31,11 @@ const DriftSeasonSchema = new Schema<IDriftSeason>({
       default: null,
     },
   ],
+  leaderboard: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Leaderboard',
+    defalt: null
+  }
 });
 
 const DriftSeason = mongoose.model<IDriftSeason>(
