@@ -1,93 +1,127 @@
-import Qualifying, { IQualifyingResultItem, IQualifyingSchemaItem, IQualifyingSchemaRun } from "../Schema/drift/Qualifying";
+import { IDriver } from "../Schema/drift/Driver";
+import Qualifying, {
+  IQualifyingResultItem,
+  IQualifyingSchemaItem,
+  IQualifyingSchemaRun,
+} from "../Schema/drift/Qualifying";
+import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
-import { Request } from 'express'
-import mongoose from 'mongoose'
-
-
-
+import { Request } from "express";
+import mongoose from "mongoose";
 
 class QualifyingService {
-    async createDriver(req: Request): Promise<IQualifyingSchemaItem | null> {
-        const {
-            eventId
-        } = req.body;
+  async createDriver(req: Request): Promise<IQualifyingSchemaItem | null> {
+    const { eventId } = req.body;
 
-        if (!await isAdmin(req)) {
-            return null
-        }
-
-        const qualifying = new Qualifying({
-            eventId
-        });
-        return await qualifying.save();
+    if (!(await isAdmin(req))) {
+      return null;
     }
 
-    async findAll(req: Request): Promise<IQualifyingSchemaItem[]> {
-        const isUserAdmin = await isAdmin(req);
-        if (!isUserAdmin) return [];
-        return await Qualifying.find();
-    }
+    const qualifying = new Qualifying({
+      eventId,
+    });
+    return await qualifying.save();
+  }
 
-    async findById(id: string): Promise<IQualifyingSchemaItem | null> {
-        return await Qualifying.findById(id);
-    }
+  async findAll(req: Request): Promise<IQualifyingSchemaItem[]> {
+    const isUserAdmin = await isAdmin(req);
+    if (!isUserAdmin) return [];
+    return await Qualifying.find();
+  }
 
+  async findById(id: string): Promise<IQualifyingSchemaItem | null> {
+    return await Qualifying.findById(id);
+  }
 
-    // async addResultToQualifying(req: Request): Promise<{ success?: IQualifyingSchemaItem, error?: string }> {
-    //     const {
-    //         driverId,
-    //         leaderboardId,
-    //         score,
-    //         numOfWins,
-    //         numOfSeconds,
-    //         numOfThirds
-    //     } = req.body
-    //     const [isUserAdmin, leaderboard, driver] = await Promise.all([
-    //         isAdmin(req),
-    //         this.findById(leaderboardId),
-    //         driverService.findById(driverId) as unknown as IDriver
-    //     ])
+  async createQualifying(eventId: string): Promise<IQualifyingSchemaItem> {
+    const qualifying = await Qualifying.create({ eventId, resultList: [] });
+    return qualifying;
+  }
 
-    //     if (!isUserAdmin) {
-    //         return { error: 'Cannot edit scoreboard' }
-    //     }
+  async handleCreateQualifying(req: Request): Promise<IQualifyingSchemaItem> {
+    const { eventId } = req.body;
 
+    return await this.createQualifying(eventId);
+  }
 
-    //     // if (!canAccess) return { error: 'Cannot edit fishin permit' }
+  // Method to create a new QualifyingResultItem and add it to the resultList of a Qualifying
+  async createResultItem(
+    qualifyingId: string,
+    driverId: string
+  ): Promise<IQualifyingSchemaItem> {
+    console.log("ADADADASDA");
+    const driver = (await driverService.findById(
+      driverId
+    )) as unknown as IDriver;
+    const resultItem = {
+      driver,
+      run1: null,
+      run2: null,
+    };
+    console.log({ resultItem });
 
-    //     const scoreboardDriver = {
-    //         driver,
-    //         score,
-    //         numOfWins,
-    //         numOfSeconds,
-    //         numOfThirds
-    //     }
+    const qualifying = await Qualifying.findByIdAndUpdate(
+      qualifyingId,
+      { $push: { resultList: resultItem } },
+      { new: true }
+    );
 
-    //     leaderboard?.scoreboard.push(scoreboardDriver)
-    //     const updated = await leaderboard?.save()
-    //     return { success: updated }
-    // }
+    return qualifying as IQualifyingSchemaItem;
+  }
 
-    async addQualifyingRun(req: Request) {
-        const { qualResultId, line, angle, style } = req.body
+  async handleCreateResultItem(
+    req: Request
+  ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
+    const { qualifyingId, driverId } = req.body;
 
-        const qualifyingOfResult = await Qualifying.find(
-            { resultList: new mongoose.Types.ObjectId(qualResultId) }
-        )
-        const result = qualifyingOfResult?.[0]?.resultList?.find(r => r?._id === qualResultId)
+    const qualifying = await this.createResultItem(qualifyingId, driverId);
 
-        
-    }
+    if (!qualifying) return { error: "creating result failed", success: null };
+    return { error: "", success: qualifying };
+  }
 
-    private resultHasRun1(qualifyingResult: IQualifyingResultItem): boolean {
-        return !!qualifyingResult?.run1
-    }
+  // Method to add run1 and/or run2 to a specific QualifyingResultItem in the resultList of a Qualifying
+  async addRunsToResultItem(
+    qualifyingId: string,
+    resultItemId: string,
+    runs: Partial<IQualifyingResultItem>
+  ): Promise<IQualifyingSchemaItem> {
+    console.log("HALOOO");
 
-    private createNewRun({ line, angle, style }: { line: number, angle: number, style: number }): IQualifyingSchemaRun {
-        return {
-            line, angle, style
-        }
-    }
+    const testi = await Qualifying.findOne({
+      _id: qualifyingId,
+      "resultList._id": resultItemId,
+    });
+    console.log({testi})
+    const qualifying = await Qualifying.findOneAndUpdate(
+      { _id: qualifyingId, "resultList._id": resultItemId },
+      {
+        $set: {
+            ...(runs.run1 !== undefined ? { "resultList.$.run1": runs.run1 } : {}),
+            ...(runs.run2 !== undefined ? { "resultList.$.run2": runs.run2 } : {}),
+          },
+      },
+      { new: true }
+    );
+    console.log({ qualifying });
+
+    return qualifying as IQualifyingSchemaItem;
+  }
+
+  async handleAddRunsToResultItem(
+    req: Request
+  ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
+    const { qualifyingId, resultItemId, runs } = req.body;
+
+    const qualifying = await this.addRunsToResultItem(
+      qualifyingId,
+      resultItemId,
+      runs
+    );
+
+    if (!qualifying) return { error: "creating result failed", success: null };
+    return { error: "", success: qualifying };
+  }
 }
 
-export default new QualifyingService()
+export default new QualifyingService();

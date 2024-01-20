@@ -9,8 +9,8 @@ export interface IQualifyingSchemaRun {
 
 export interface IQualifyingResultItem extends Document {
   driver: IDriver
-  run1: IQualifyingSchemaRun
-  run2: IQualifyingSchemaRun
+  run1: IQualifyingSchemaRun | null
+  run2: IQualifyingSchemaRun | null
 }
 
 export interface IQualifyingSchemaItem extends Document {
