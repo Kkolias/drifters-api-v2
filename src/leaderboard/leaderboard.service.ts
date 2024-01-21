@@ -25,11 +25,11 @@ class LeaderboardService {
     async findAll(req: Request): Promise<ILeaderboard[]> {
         const isUserAdmin = await isAdmin(req);
         if (!isUserAdmin) return [];
-        return await Leaderboard.find();
+        return await Leaderboard.find().populate('scoreboard.driver');
     }
 
     async findById(id: string): Promise<ILeaderboard | null> {
-        return await Leaderboard.findById(id);
+        return await Leaderboard.findById(id).populate('scoreboard.driver');
     }
 
 

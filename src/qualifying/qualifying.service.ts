@@ -4,25 +4,12 @@ import Qualifying, {
   IQualifyingSchemaItem,
   IQualifyingSchemaRun,
 } from "../Schema/drift/Qualifying";
+import driftEventService from "../drift-event/drift-event.service";
 import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
-import mongoose from "mongoose";
 
 class QualifyingService {
-  async createDriver(req: Request): Promise<IQualifyingSchemaItem | null> {
-    const { eventId } = req.body;
-
-    if (!(await isAdmin(req))) {
-      return null;
-    }
-
-    const qualifying = new Qualifying({
-      eventId,
-    });
-    return await qualifying.save();
-  }
-
   async findAll(req: Request): Promise<IQualifyingSchemaItem[]> {
     const isUserAdmin = await isAdmin(req);
     if (!isUserAdmin) return [];
@@ -35,11 +22,25 @@ class QualifyingService {
 
   async createQualifying(eventId: string): Promise<IQualifyingSchemaItem> {
     const qualifying = await Qualifying.create({ eventId, resultList: [] });
+
+    const driftEvent = await driftEventService.findById(eventId);
+
+    if (!driftEvent || !qualifying) return qualifying;
+
+    driftEvent.qualifying = qualifying;
+    driftEvent.save();
+
     return qualifying;
   }
 
-  async handleCreateQualifying(req: Request): Promise<IQualifyingSchemaItem> {
+  async handleCreateQualifying(
+    req: Request
+  ): Promise<IQualifyingSchemaItem | null> {
     const { eventId } = req.body;
+
+    if (!(await isAdmin(req))) {
+      return null;
+    }
 
     return await this.createQualifying(eventId);
   }
@@ -86,24 +87,20 @@ class QualifyingService {
     resultItemId: string,
     runs: Partial<IQualifyingResultItem>
   ): Promise<IQualifyingSchemaItem> {
-    console.log("HALOOO");
-
-    const testi = await Qualifying.findOne({
-      _id: qualifyingId,
-      "resultList._id": resultItemId,
-    });
-    console.log({testi})
     const qualifying = await Qualifying.findOneAndUpdate(
       { _id: qualifyingId, "resultList._id": resultItemId },
       {
         $set: {
-            ...(runs.run1 !== undefined ? { "resultList.$.run1": runs.run1 } : {}),
-            ...(runs.run2 !== undefined ? { "resultList.$.run2": runs.run2 } : {}),
-          },
+          ...(runs.run1 !== undefined
+            ? { "resultList.$.run1": runs.run1 }
+            : {}),
+          ...(runs.run2 !== undefined
+            ? { "resultList.$.run2": runs.run2 }
+            : {}),
+        },
       },
       { new: true }
     );
-    console.log({ qualifying });
 
     return qualifying as IQualifyingSchemaItem;
   }

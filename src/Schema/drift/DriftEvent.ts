@@ -5,7 +5,7 @@ import { IQualifyingSchemaItem } from "./Qualifying";
 export interface IDriftEventSchema extends Document {
   seasonId: string;
   qualifying: IQualifyingSchemaItem;
-  // tandems: tähän
+  // tandems: TODO
   createdAt: Date;
 }
 
