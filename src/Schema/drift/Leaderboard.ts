@@ -14,15 +14,13 @@ export interface ScoreboardItem {
 }
 
 export interface ILeaderboard extends Document {
-  serie: DriftSerie;
-  year: number;
+  seasonId: string;
   scoreboard: ScoreboardItem[];
   createdAt: Date;
 }
 
 const LeaderboardSchema = new Schema<ILeaderboard>({
-  serie: { type: String, required: true },
-  year: { type: Number, required: true },
+  seasonId: { type: String, required: true },
   createdAt: { type: Date, default: () => Date.now() },
   scoreboard: [
     {

@@ -3,26 +3,18 @@ import userService from "../user/user.service";
 import { Request } from "express";
 import { isAdmin } from "../user/utils/isAdmin";
 
-
-
-
-
 class DriverService {
   async createDriver(req: Request): Promise<IDriver | null> {
-    const {
-      firstName,
-      lastName,
-      age
-    } = req.body;
+    const { firstName, lastName, age } = req.body;
 
-    if (!await isAdmin(req)) {
-      return null
+    if (!(await isAdmin(req))) {
+      return null;
     }
 
     const driver = new Driver({
       firstName,
       lastName,
-      age
+      age,
     });
     return await driver.save();
   }
@@ -37,22 +29,23 @@ class DriverService {
     return await Driver.findById(id);
   }
 
-  async addCarToDriver(req: Request): Promise<{ success?: IDriver, error?: string }> {
-    const { driverId, model,
-      engine,
-      torque,
-      hp,
-      activeFrom,
-      activeTo } = req.body
+  async findByIdList(idList: string[]): Promise<IDriver[]> {
+    return await Driver.find({ _id: { $in: idList } });
+  }
+
+  async addCarToDriver(
+    req: Request
+  ): Promise<{ success?: IDriver; error?: string }> {
+    const { driverId, model, engine, torque, hp, activeFrom, activeTo } =
+      req.body;
     const [isUserAdmin, driver] = await Promise.all([
       isAdmin(req),
-      this.findById(driverId)
-    ])
+      this.findById(driverId),
+    ]);
 
     if (!isUserAdmin) {
-      return { error: 'Cannot edit driver' }
+      return { error: "Cannot edit driver" };
     }
-
 
     // if (!canAccess) return { error: 'Cannot edit fishin permit' }
 
@@ -62,13 +55,13 @@ class DriverService {
       torque,
       hp,
       activeFrom,
-      activeTo
-    }
+      activeTo,
+    };
 
-    driver?.cars.push(car)
-    const updated = await driver?.save()
-    return { success: updated }
+    driver?.cars.push(car);
+    const updated = await driver?.save();
+    return { success: updated };
   }
 }
 
-export default new DriverService()
+export default new DriverService();

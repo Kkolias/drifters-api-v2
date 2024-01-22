@@ -34,7 +34,7 @@ const DriftSeasonSchema = new Schema<IDriftSeason>({
   leaderboard: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Leaderboard',
-    defalt: null
+    default: null
   }
 });
 

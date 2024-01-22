@@ -1,4 +1,5 @@
 import DriftEvent, { IDriftEventSchema } from "../Schema/drift/DriftEvent";
+import driftSeasonService from "../drift-season/drift-season.service";
 import qualifyingService from "../qualifying/qualifying.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
@@ -16,6 +17,14 @@ export class DriftEventService {
 
   async createDriftEvent(seasonId: string): Promise<IDriftEventSchema> {
     const driftEvent = await DriftEvent.create({ seasonId });
+
+    const driftSeason = await driftSeasonService.findById(seasonId);
+
+    if (!driftEvent || !driftSeason) return driftEvent;
+
+    driftSeason.driftEvents.push(driftEvent)
+    driftSeason.save();
+
     return driftEvent;
   }
 

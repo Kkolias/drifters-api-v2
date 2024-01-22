@@ -1,5 +1,6 @@
 import { IDriver } from "../Schema/drift/Driver";
 import Leaderboard, { ILeaderboard } from "../Schema/drift/Leaderboard";
+import driftSeasonService from "../drift-season/drift-season.service";
 import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from 'express'
@@ -9,7 +10,7 @@ import { Request } from 'express'
 class LeaderboardService {
     async createDriver(req: Request): Promise<ILeaderboard | null> {
         const {
-            serie, year
+            seasonId
         } = req.body;
 
         if (!await isAdmin(req)) {
@@ -17,9 +18,18 @@ class LeaderboardService {
         }
 
         const leaderboard = new Leaderboard({
-            serie, year
+            seasonId
         });
-        return await leaderboard.save();
+        const savedLeaderboard = await leaderboard.save();
+
+        const driftSeason = await driftSeasonService.findById(seasonId)
+
+        if(!driftSeason || !savedLeaderboard) return savedLeaderboard
+
+        driftSeason.leaderboard = savedLeaderboard
+        driftSeason.save()
+
+        return savedLeaderboard
     }
 
     async findAll(req: Request): Promise<ILeaderboard[]> {

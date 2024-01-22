@@ -7,6 +7,7 @@ import driverRouter from './routes/driver.routes'
 import leaderboardRouter from './routes/leaderboard.routes'
 import qualifyingRouter from './routes/qualifying.routes'
 import driftEventRouter from './routes/drift-event.routes'
+import driftSeasonRouter from './routes/drift-season.routes'
 
 const app = express();
 const port = 8000;
@@ -36,6 +37,7 @@ app.use('/driver', driverRouter)
 app.use('/leaderboard', leaderboardRouter)
 app.use('/qualifying', qualifyingRouter)
 app.use('/drift-event', driftEventRouter)
+app.use('/drift-season', driftSeasonRouter)
 
 
 // MONGODB SETUP
