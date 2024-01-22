@@ -1,11 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IQualifyingSchemaItem } from "./Qualifying";
+import { ICompetitionDayItem } from "./CompetitionDay";
 
 // TODO: tästä computed outout versio missä laskettu voittajia yms statstiikkaa
 export interface IDriftEventSchema extends Document {
   seasonId: string;
   qualifying: IQualifyingSchemaItem;
-  // tandems: TODO
+  competitionDay: ICompetitionDayItem
   createdAt: Date;
 }
 
@@ -14,6 +15,11 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   qualifying: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Qualifying",
+    default: null
+  },
+  competitionDay: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "competitionDay",
     default: null
   },
 });
