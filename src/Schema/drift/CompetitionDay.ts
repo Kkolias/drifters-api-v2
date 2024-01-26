@@ -27,6 +27,7 @@ export interface IHeat extends Document {
   driver1: IDriver;
   driver2: IDriver;
   heatType: string; // esim top32 top16 karsinnat
+  bracketNumber: number; // vasen on 1-16 oikea 17-32 vasen 2 on 33-40 oikea 41-48 jne
   runList: IRunItem[];
 }
 
@@ -57,6 +58,7 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
         required: true,
       },
       heatType: { type: String, default: "" },
+      bracketNumber: { type: Number, default: 0 },
       runList: [
         {
           type: { type: String, default: RunType.normal },

@@ -8,16 +8,24 @@ import driftEventService from "../drift-event/drift-event.service";
 import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
+import qualifyingCompute, { IQualifyingComputedItem } from "./computed/qualifying.compute";
 
 class QualifyingService {
   async findAll(req: Request): Promise<IQualifyingSchemaItem[]> {
     const isUserAdmin = await isAdmin(req);
     if (!isUserAdmin) return [];
-    return await Qualifying.find();
+    return await Qualifying.find().lean().populate("resultList.driver");
   }
 
-  async findById(id: string): Promise<IQualifyingSchemaItem | null> {
-    return await Qualifying.findById(id);
+  async findAllComputed(req: Request): Promise<IQualifyingComputedItem[]> {
+    const items = await this.findAll(req)
+    return qualifyingCompute.getOutputQualifyingList(items);
+  }
+
+  async findById(id: string): Promise<IQualifyingComputedItem | null> {
+    const qualifying = await Qualifying.findById(id);
+    if(!qualifying) return null
+    return qualifyingCompute.getOutputQualifying(qualifying);
   }
 
   async createQualifying(eventId: string): Promise<IQualifyingSchemaItem> {

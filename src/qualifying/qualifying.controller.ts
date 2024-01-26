@@ -18,7 +18,7 @@ export class QualifyingController {
 
     async getAll(req: Request, res: Response) {
         try {
-            const qualifyings = await qualifyingService.findAll(req);
+            const qualifyings = await qualifyingService.findAllComputed(req);
             res.status(200).json(qualifyings);
         } catch (error) {
             console.error(error);

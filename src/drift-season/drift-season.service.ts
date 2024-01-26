@@ -10,7 +10,17 @@ export class DriftSeasonService {
   async findAll(req: Request): Promise<IDriftSeason[]> {
     const isUserAdmin = await isAdmin(req);
     if (!isUserAdmin) return [];
-    return await DriftSeason.find().populate("driftEvents").populate('leaderboard').exec();
+
+    return await DriftSeason.find()
+      .populate({
+        path: "driftEvents",
+        populate: [
+          { path: "qualifying" },
+          { path: "competitionDay" }
+        ]
+      })
+      .populate('leaderboard')
+      .exec();
   }
 
   async findById(id: string): Promise<IDriftSeason | null> {

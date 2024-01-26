@@ -19,7 +19,7 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   },
   competitionDay: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "competitionDay",
+    ref: "CompetitionDay",
     default: null
   },
 });

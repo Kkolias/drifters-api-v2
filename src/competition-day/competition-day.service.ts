@@ -51,6 +51,7 @@ export class CompetitionDayService {
     driver1Id: string,
     driver2Id: string,
     heatType: string,
+    bracketNumber: number,
     competitionDayId: string
   ): Promise<{ success: ICompetitionDayItem | null; error?: string }> {
     const [driver1, driver2] = await Promise.all([
@@ -65,6 +66,7 @@ export class CompetitionDayService {
       driver1,
       driver2,
       heatType,
+      bracketNumber,
       runList: [],
     };
 
@@ -80,11 +82,12 @@ export class CompetitionDayService {
   async handleAddHeatToCompetitionDay(
     req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
-    const { driver1Id, driver2Id, heatType, competitionDayId } = req.body;
+    const { driver1Id, driver2Id, heatType, bracketNumber, competitionDayId } = req.body;
     return await this.addHeatToCompetitionDay(
       driver1Id,
       driver2Id,
       heatType,
+      bracketNumber,
       competitionDayId
     );
   }
@@ -142,23 +145,6 @@ export class CompetitionDayService {
       judgePoint3: JudgePoint;
     }
   ) {
-    // const competitionDay = await CompetitionDay.findOneAndUpdate(
-    //   { _id: competitionDayId, "heatList.runList._id": runId },
-    //   {
-    //     $set: {
-    //       ...(judgePoint1 !== undefined
-    //         ? { "heatList.runList.$.judgePoint1": judgePoint1 }
-    //         : {}),
-    //       ...(judgePoint2 !== undefined
-    //         ? { "heatList.runList.$.judgePoint2": judgePoint2 }
-    //         : {}),
-    //       ...(judgePoint3 !== undefined
-    //         ? { "heatList.runList.$.judgePoint3": judgePoint3 }
-    //         : {}),
-    //     },
-    //   },
-    //   { new: true }
-    // );
     const competitionDay = await CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId, "heatList.runList._id": runId },
       {
@@ -195,32 +181,6 @@ export class CompetitionDayService {
 
     return { success: competitionDay };
   }
-  // async addHeatToCompetitionDay(
-  //   driver1Id: string,
-  //   driver2Id: string,
-  //   heatType: string,
-  //   competitionDayId: string
-  // ): Promise<{ success: ICompetitionDayItem | null; error?: string }> {
-  //   const [driver1, driver2, competitionDay] = await Promise.all([
-  //     driverService.findById(driver1Id),
-  //     driverService.findById(driver2Id),
-  //     this.findById(competitionDayId),
-  //   ]);
-
-  //   if (!driver1 || !driver2 || !competitionDay)
-  //     return { error: "unexpected error", success: null };
-
-  //   const heatItem = {
-  //     driver1,
-  //     driver2,
-  //     heatType,
-  //     runList: [],
-  //   } as IHeat;
-  //   competitionDay.heatList.push(heatItem);
-  //   competitionDay.save();
-
-  //   return { success: competitionDay };
-  // }
 }
 
 export default new CompetitionDayService();
