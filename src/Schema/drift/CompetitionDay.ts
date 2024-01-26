@@ -1,12 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IDriver } from "./Driver";
 
-// Mongoose used to define this before mongoose 6. For backward's compatibility, we will now just define it ourselves.
-export interface HookNextFunction {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (error?: Error): any
-}
-
 export enum RunType {
   omt = "omt", // one more time
   byeRun = "byeRun",
@@ -29,7 +23,7 @@ export interface IRunItem {
   judgePoint3: JudgePoint | null;
 }
 
-export interface IHeat {
+export interface IHeat extends Document {
   driver1: IDriver;
   driver2: IDriver;
   heatType: string; // esim top32 top16 karsinnat

@@ -1,6 +1,8 @@
 import CompetitionDay, {
   ICompetitionDayItem,
+  IHeat,
   IRunItem,
+  JudgePoint,
 } from "../Schema/drift/CompetitionDay";
 import driftEventService from "../drift-event/drift-event.service";
 import driverService from "../driver/driver.service";
@@ -11,14 +13,14 @@ export class CompetitionDayService {
   async findAll(req: Request): Promise<ICompetitionDayItem[]> {
     const isUserAdmin = await isAdmin(req);
     if (!isUserAdmin) return [];
-    return await CompetitionDay.find();
+    return await CompetitionDay.find().populate("heatList.runList");
   }
 
   async findById(id: string): Promise<ICompetitionDayItem | null> {
     return await CompetitionDay.findById(id);
   }
 
-  async createQualifying(eventId: string): Promise<ICompetitionDayItem> {
+  async createCompetitionDay(eventId: string): Promise<ICompetitionDayItem> {
     const competitionDay = await CompetitionDay.create({
       eventId,
       resultList: [],
@@ -34,32 +36,191 @@ export class CompetitionDayService {
     return competitionDay;
   }
 
+  async handleCreateCompetitionDay(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const { eventId } = req.body;
+    const competitionDay = await this.createCompetitionDay(eventId);
+    if (!competitionDay)
+      return { error: "Error creating competition day", success: null };
+
+    return { success: competitionDay };
+  }
+
   async addHeatToCompetitionDay(
     driver1Id: string,
     driver2Id: string,
     heatType: string,
     competitionDayId: string
   ): Promise<{ success: ICompetitionDayItem | null; error?: string }> {
-    const [driver1, driver2, competitionDay] = await Promise.all([
+    const [driver1, driver2] = await Promise.all([
       driverService.findById(driver1Id),
       driverService.findById(driver2Id),
-      this.findById(competitionDayId),
     ]);
 
-    if (!driver1 || !driver2 || !competitionDay)
+    if (!driver1 || !driver2)
       return { error: "unexpected error", success: null };
 
-    const heatItem = {
+    const newHeat = {
       driver1,
       driver2,
       heatType,
       runList: [],
     };
-    competitionDay.heatList.push(heatItem);
-    competitionDay.save();
+
+    const competitionDay = await CompetitionDay.findOneAndUpdate(
+      { _id: competitionDayId },
+      { $push: { heatList: newHeat } },
+      { new: true }
+    );
 
     return { success: competitionDay };
   }
+
+  async handleAddHeatToCompetitionDay(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const { driver1Id, driver2Id, heatType, competitionDayId } = req.body;
+    return await this.addHeatToCompetitionDay(
+      driver1Id,
+      driver2Id,
+      heatType,
+      competitionDayId
+    );
+  }
+
+  async addRunToHeat(
+    competitionDayId: string,
+    heatId: string,
+    newRun: Partial<IRunItem>
+  ): Promise<ICompetitionDayItem> {
+    // const newRun = {
+    //   type,
+    //   runNumber,
+    //   leadDriverId,
+    //   chaseDriverId,
+    // };
+
+    console.log("NEW: ", newRun);
+
+    const competitionDay = await CompetitionDay.findOneAndUpdate(
+      { _id: competitionDayId, "heatList._id": heatId },
+      { $push: { 'heatList.$.runList': newRun } },
+      { new: true }
+    );
+
+    return competitionDay as ICompetitionDayItem;
+  }
+
+  async handleAddRunToHeat(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const { competitionDayId, heatId, newRun } = req.body;
+    const competitionDay = await this.addRunToHeat(
+      competitionDayId,
+      heatId,
+      newRun
+    );
+
+    if (!competitionDay)
+      return { error: "Error creating competition day", success: null };
+
+    return { success: competitionDay };
+  }
+
+  async giveJudgePointsToRun(
+    competitionDayId: string,
+    heatId: string,
+    runId: string,
+    {
+      judgePoint1,
+      judgePoint2,
+      judgePoint3,
+    }: {
+      judgePoint1: JudgePoint;
+      judgePoint2: JudgePoint;
+      judgePoint3: JudgePoint;
+    }
+  ) {
+    // const competitionDay = await CompetitionDay.findOneAndUpdate(
+    //   { _id: competitionDayId, "heatList.runList._id": runId },
+    //   {
+    //     $set: {
+    //       ...(judgePoint1 !== undefined
+    //         ? { "heatList.runList.$.judgePoint1": judgePoint1 }
+    //         : {}),
+    //       ...(judgePoint2 !== undefined
+    //         ? { "heatList.runList.$.judgePoint2": judgePoint2 }
+    //         : {}),
+    //       ...(judgePoint3 !== undefined
+    //         ? { "heatList.runList.$.judgePoint3": judgePoint3 }
+    //         : {}),
+    //     },
+    //   },
+    //   { new: true }
+    // );
+    const competitionDay = await CompetitionDay.findOneAndUpdate(
+      { _id: competitionDayId, "heatList.runList._id": runId },
+      {
+        $set: {
+          "heatList.$[outer].runList.$[inner].judgePoint1": judgePoint1,
+          "heatList.$[outer].runList.$[inner].judgePoint2": judgePoint2,
+          "heatList.$[outer].runList.$[inner].judgePoint3": judgePoint3,
+        },
+      },
+      {
+        new: true,
+        arrayFilters: [
+          { "outer._id": heatId },
+          { "inner._id": runId },
+        ],
+      }
+    );
+    return competitionDay;
+  }
+
+  async handleGiveJudgePointsToRun(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const { competitionDayId, heatId, runId, judgePoints } = req.body;
+    const competitionDay = await this.giveJudgePointsToRun(
+      competitionDayId,
+      heatId,
+      runId,
+      judgePoints
+    );
+
+    if (!competitionDay)
+      return { error: "Error creating competition day", success: null };
+
+    return { success: competitionDay };
+  }
+  // async addHeatToCompetitionDay(
+  //   driver1Id: string,
+  //   driver2Id: string,
+  //   heatType: string,
+  //   competitionDayId: string
+  // ): Promise<{ success: ICompetitionDayItem | null; error?: string }> {
+  //   const [driver1, driver2, competitionDay] = await Promise.all([
+  //     driverService.findById(driver1Id),
+  //     driverService.findById(driver2Id),
+  //     this.findById(competitionDayId),
+  //   ]);
+
+  //   if (!driver1 || !driver2 || !competitionDay)
+  //     return { error: "unexpected error", success: null };
+
+  //   const heatItem = {
+  //     driver1,
+  //     driver2,
+  //     heatType,
+  //     runList: [],
+  //   } as IHeat;
+  //   competitionDay.heatList.push(heatItem);
+  //   competitionDay.save();
+
+  //   return { success: competitionDay };
+  // }
 }
 
 export default new CompetitionDayService();
