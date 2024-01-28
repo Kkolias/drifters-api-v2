@@ -2,12 +2,16 @@ import CompetitionDay, {
   ICompetitionDayItem,
   IHeat,
   IRunItem,
+  IRunPairItem,
   JudgePoint,
 } from "../Schema/drift/CompetitionDay";
 import driftEventService from "../drift-event/drift-event.service";
 import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
+import competitionDayComputed, {
+  ICompetitionDayComputed,
+} from "./computed/competition-day.computed";
 
 export class CompetitionDayService {
   async findAll(req: Request): Promise<ICompetitionDayItem[]> {
@@ -16,8 +20,14 @@ export class CompetitionDayService {
     return await CompetitionDay.find().populate("heatList.runList");
   }
 
-  async findById(id: string): Promise<ICompetitionDayItem | null> {
-    return await CompetitionDay.findById(id);
+  async findById(id: string): Promise<ICompetitionDayComputed | null> {
+    const competitionDay = await CompetitionDay.findById(id)
+      .lean()
+      .populate("heatList.driver1")
+      .populate("heatList.driver2");
+    if (!competitionDay) return null;
+
+    return competitionDayComputed.computeCompetitionDay(competitionDay);
   }
 
   async createCompetitionDay(eventId: string): Promise<ICompetitionDayItem> {
@@ -82,7 +92,8 @@ export class CompetitionDayService {
   async handleAddHeatToCompetitionDay(
     req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
-    const { driver1Id, driver2Id, heatType, bracketNumber, competitionDayId } = req.body;
+    const { driver1Id, driver2Id, heatType, bracketNumber, competitionDayId } =
+      req.body;
     return await this.addHeatToCompetitionDay(
       driver1Id,
       driver2Id,
@@ -95,20 +106,29 @@ export class CompetitionDayService {
   async addRunToHeat(
     competitionDayId: string,
     heatId: string,
-    newRun: Partial<IRunItem>
+    newRun: Partial<IRunPairItem>
   ): Promise<ICompetitionDayItem> {
-    // const newRun = {
-    //   type,
-    //   runNumber,
-    //   leadDriverId,
-    //   chaseDriverId,
-    // };
+    const heat = await CompetitionDay.findOne(
+      { _id: competitionDayId, "heatList._id": heatId },
+      { "heatList.$": 1 }
+    );
 
-    console.log("NEW: ", newRun);
+    if (!heat) {
+      throw new Error("Heat not found");
+    }
+
+    const runNumber = heat.heatList[0].runList.length + 1;
 
     const competitionDay = await CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId, "heatList._id": heatId },
-      { $push: { 'heatList.$.runList': newRun } },
+      {
+        $push: {
+          "heatList.$.runList": {
+            ...newRun,
+            runNumber,
+          },
+        },
+      },
       { new: true }
     );
 
@@ -156,10 +176,7 @@ export class CompetitionDayService {
       },
       {
         new: true,
-        arrayFilters: [
-          { "outer._id": heatId },
-          { "inner._id": runId },
-        ],
+        arrayFilters: [{ "outer._id": heatId }, { "inner._id": runId }],
       }
     );
     return competitionDay;
