@@ -6,6 +6,7 @@ import { isAdmin } from "../user/utils/isAdmin";
 class DriverService {
   async createDriver(req: Request): Promise<IDriver | null> {
     const { firstName, lastName, age } = req.body;
+    const cars = req.body?.cars || [];
 
     if (!(await isAdmin(req))) {
       return null;
@@ -15,6 +16,7 @@ class DriverService {
       firstName,
       lastName,
       age,
+      cars
     });
     return await driver.save();
   }
