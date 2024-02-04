@@ -8,21 +8,27 @@ export class DriftEventService {
   async findAll(req: Request): Promise<IDriftEventSchema[]> {
     const isUserAdmin = await isAdmin(req);
     if (!isUserAdmin) return [];
-    return await DriftEvent.find().populate('qualifying');
+    return await DriftEvent.find().populate("qualifying");
   }
 
   async findById(id: string): Promise<IDriftEventSchema | null> {
-    return await DriftEvent.findById(id).populate('qualifying');
+    return await DriftEvent.findById(id).populate("qualifying");
   }
 
-  async createDriftEvent(seasonId: string): Promise<IDriftEventSchema> {
-    const driftEvent = await DriftEvent.create({ seasonId });
+  async createDriftEvent(payload: {
+    seasonId: string;
+    name: string;
+    country: string;
+    startsAt: Date;
+    endsAt: Date;
+  }): Promise<IDriftEventSchema> {
+    const driftEvent = await DriftEvent.create(payload);
 
-    const driftSeason = await driftSeasonService.findById(seasonId);
+    const driftSeason = await driftSeasonService.findById(payload.seasonId);
 
     if (!driftEvent || !driftSeason) return driftEvent;
 
-    driftSeason.driftEvents.push(driftEvent)
+    driftSeason.driftEvents.push(driftEvent);
     driftSeason.save();
 
     return driftEvent;
@@ -31,13 +37,19 @@ export class DriftEventService {
   async handleCreateDriftEvent(
     req: Request
   ): Promise<IDriftEventSchema | null> {
-    const { seasonId } = req.body;
+    const { seasonId, name, country, startsAt, endsAt } = req.body;
 
     if (!(await isAdmin(req))) {
       return null;
     }
 
-    return await this.createDriftEvent(seasonId);
+    return await this.createDriftEvent({
+      seasonId,
+      name,
+      country,
+      startsAt,
+      endsAt,
+    });
   }
 
   async addQualifyingToDriftEvent(
@@ -64,7 +76,7 @@ export class DriftEventService {
 
     const qualifying = await this.addQualifyingToDriftEvent(
       qualifyingId,
-      driftEventId,
+      driftEventId
     );
 
     if (!qualifying) return { error: "updating event failed", success: null };

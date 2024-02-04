@@ -14,12 +14,9 @@ export class DriftSeasonService {
     return await DriftSeason.find()
       .populate({
         path: "driftEvents",
-        populate: [
-          { path: "qualifying" },
-          { path: "competitionDay" }
-        ]
+        populate: [{ path: "qualifying" }, { path: "competitionDay" }],
       })
-      .populate('leaderboard')
+      .populate("leaderboard")
       .exec();
   }
 
