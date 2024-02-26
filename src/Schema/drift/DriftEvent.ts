@@ -20,6 +20,7 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   endsAt: { type: Date, default: null },
   country: { type: String, required: true },
   name: { type: String, required: true },
+  seasonId: { type: String, required: true },
   qualifying: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Qualifying",

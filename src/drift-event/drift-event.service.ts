@@ -12,7 +12,8 @@ export class DriftEventService {
   }
 
   async findById(id: string): Promise<IDriftEventSchema | null> {
-    return await DriftEvent.findById(id).populate("qualifying");
+    // populate qualifying and competitionDay
+    return await DriftEvent.findById(id).populate("qualifying").populate("competitionDay").exec();
   }
 
   async createDriftEvent(payload: {
