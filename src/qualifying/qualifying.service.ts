@@ -8,7 +8,9 @@ import driftEventService from "../drift-event/drift-event.service";
 import driverService from "../driver/driver.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
-import qualifyingCompute, { IQualifyingComputedItem } from "./computed/qualifying.compute";
+import qualifyingCompute, {
+  IQualifyingComputedItem,
+} from "./computed/qualifying.compute";
 
 class QualifyingService {
   async findAll(req: Request): Promise<IQualifyingSchemaItem[]> {
@@ -18,13 +20,13 @@ class QualifyingService {
   }
 
   async findAllComputed(req: Request): Promise<IQualifyingComputedItem[]> {
-    const items = await this.findAll(req)
+    const items = await this.findAll(req);
     return qualifyingCompute.getOutputQualifyingList(items);
   }
 
   async findById(id: string): Promise<IQualifyingComputedItem | null> {
     const qualifying = await Qualifying.findById(id);
-    if(!qualifying) return null
+    if (!qualifying) return null;
     return qualifyingCompute.getOutputQualifying(qualifying);
   }
 
@@ -78,6 +80,30 @@ class QualifyingService {
     return qualifying as IQualifyingSchemaItem;
   }
 
+  async createResultItemList(
+    qualifyingId: string,
+    driverIdList: string[]
+  ): Promise<IQualifyingSchemaItem> {
+    const driverList = (await driverService.findByIdList(
+      driverIdList
+    )) as unknown as IDriver[];
+    const resultItemList = driverList.map((driver) => {
+      return {
+        driver,
+        run1: null,
+        run2: null,
+      };
+    });
+
+    const qualifying = await Qualifying.findByIdAndUpdate(
+      qualifyingId,
+      { $push: { resultList: { $each: resultItemList } } },
+      { new: true }
+    );
+
+    return qualifying as IQualifyingSchemaItem;
+  }
+
   async handleCreateResultItem(
     req: Request
   ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
@@ -86,6 +112,17 @@ class QualifyingService {
     const qualifying = await this.createResultItem(qualifyingId, driverId);
 
     if (!qualifying) return { error: "creating result failed", success: null };
+    return { error: "", success: qualifying };
+  }
+
+  async handleCreateResultItemList(
+    req: Request
+  ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
+    const { qualifyingId, driverIdList } = req.body;
+
+    const qualifying = await this.createResultItemList(qualifyingId, driverIdList);
+
+    if (!qualifying) return { error: "creating resultlist failed", success: null };
     return { error: "", success: qualifying };
   }
 

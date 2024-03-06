@@ -7,6 +7,7 @@ router.get('/get-all', qualifyingController.getAll)
 router.get('/get-by-id', qualifyingController.getById)
 router.post('/create', qualifyingController.createQualifying)
 router.post('/create-result-item', qualifyingController.createResultItemToQualifying)
+router.post('/create-result-item-list', qualifyingController.createResultItemListToQualifying)
 router.post('/add-run-to-result', qualifyingController.addRunsToResultItem)
 
 

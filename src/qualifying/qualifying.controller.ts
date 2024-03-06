@@ -53,6 +53,22 @@ export class QualifyingController {
         }
       }
 
+    async createResultItemListToQualifying(req: Request, res: Response) {
+        try {
+          const { success, error } =
+            await qualifyingService.handleCreateResultItemList(req);
+    
+          if (error) {
+            res.status(400).json(error);
+          } else {
+            res.status(200).json(success);
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Failed to update qualifying data" });
+        }
+      }
+
     async addRunsToResultItem(req: Request, res: Response) {
         try {
           const { success, error } =
