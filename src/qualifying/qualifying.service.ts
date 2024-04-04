@@ -82,18 +82,25 @@ class QualifyingService {
 
   async createResultItemList(
     qualifyingId: string,
-    driverIdList: string[]
+    driverList: { id: string; orderNumber: number }[]
   ): Promise<IQualifyingSchemaItem> {
-    const driverList = (await driverService.findByIdList(
+    const driverIdList = driverList.map((driver) => driver.id);
+    const drivers = (await driverService.findByIdList(
       driverIdList
     )) as unknown as IDriver[];
-    const resultItemList = driverList.map((driver) => {
+
+    const resultItemList = drivers.map((driver: IDriver) => {
+      const orderNumber = this.findOrderNumberForDriver(driver, driverList);
+
       return {
         driver,
+        orderNumber,
         run1: null,
         run2: null,
       };
     });
+
+    // console.log(resultItemList);
 
     const qualifying = await Qualifying.findByIdAndUpdate(
       qualifyingId,
@@ -102,6 +109,45 @@ class QualifyingService {
     );
 
     return qualifying as IQualifyingSchemaItem;
+  }
+
+  async deleteResultItemsFromListByDriverIds(
+    qualifyingId: string,
+    driverIdList: string[]
+  ): Promise<IQualifyingSchemaItem | null> {
+    const qualifying = await Qualifying.findByIdAndUpdate(
+      qualifyingId,
+      { $pull: { resultList: { driver: { $in: driverIdList } } } },
+      { new: true }
+    );
+
+    return qualifying as IQualifyingSchemaItem;
+  }
+
+  async handleDeleteResultsByDriverIds(
+    req: Request
+  ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
+    const { qualifyingId, driverIdList } = req.body;
+
+    if (!(await isAdmin(req))) {
+      return { error: "not authorized", success: null };
+    }
+
+    const qualifying = await this.deleteResultItemsFromListByDriverIds(
+      qualifyingId,
+      driverIdList
+    );
+    if (!qualifying) return { error: "creating result failed", success: null };
+    return { error: "", success: qualifying };
+  }
+
+  private findOrderNumberForDriver(
+    driver: IDriver,
+    driverIdOrderList: { id: string; orderNumber: number }[]
+  ) {
+    return driverIdOrderList?.find((driverOrderItem) => {
+      return driverOrderItem.id === driver?._id?.toString();
+    })?.orderNumber;
   }
 
   async handleCreateResultItem(
@@ -118,11 +164,15 @@ class QualifyingService {
   async handleCreateResultItemList(
     req: Request
   ): Promise<{ error: string; success: IQualifyingSchemaItem | null }> {
-    const { qualifyingId, driverIdList } = req.body;
+    const { qualifyingId, driverList } = req.body;
 
-    const qualifying = await this.createResultItemList(qualifyingId, driverIdList);
+    const qualifying = await this.createResultItemList(
+      qualifyingId,
+      driverList
+    );
 
-    if (!qualifying) return { error: "creating resultlist failed", success: null };
+    if (!qualifying)
+      return { error: "creating resultlist failed", success: null };
     return { error: "", success: qualifying };
   }
 
