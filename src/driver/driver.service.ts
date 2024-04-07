@@ -1,5 +1,4 @@
 import Driver, { IDriver } from "../Schema/drift/Driver";
-import userService from "../user/user.service";
 import { Request } from "express";
 import { isAdmin } from "../user/utils/isAdmin";
 

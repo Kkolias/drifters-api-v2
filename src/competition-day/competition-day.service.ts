@@ -12,6 +12,7 @@ import { Request } from "express";
 import competitionDayComputed, {
   ICompetitionDayComputed,
 } from "./computed/competition-day.computed";
+import util from "./utils/createCompetitionDayFromQualifyingResults";
 
 export class CompetitionDayService {
   async findAll(req: Request): Promise<ICompetitionDayItem[]> {
@@ -197,6 +198,26 @@ export class CompetitionDayService {
       return { error: "Error creating competition day", success: null };
 
     return { success: competitionDay };
+  }
+
+  async generateCompetitionDayFromResultListForEvent(
+    eventId: string
+  ): Promise<ICompetitionDayItem> {
+    return await util.execute(eventId);
+  }
+
+  async handleGenerateCompetitionDayFromResultListForEvent(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const { eventId } = req.body;
+    const created = await this.generateCompetitionDayFromResultListForEvent(
+      eventId
+    );
+
+    if (!created)
+      return { error: "Error creating competition day", success: null };
+
+    return { success: created };
   }
 }
 

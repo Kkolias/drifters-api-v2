@@ -30,6 +30,14 @@ class QualifyingService {
     return qualifyingCompute.getOutputQualifying(qualifying);
   }
 
+  async findByEventIdCompted(
+    eventId: string
+  ): Promise<IQualifyingComputedItem | null> {
+    const qualifying = await Qualifying.findOne({ eventId }).lean().populate("resultList.driver");
+    if (!qualifying) return null;
+    return qualifyingCompute.getOutputQualifying(qualifying);
+  }
+
   async createQualifying(eventId: string): Promise<IQualifyingSchemaItem> {
     const qualifying = await Qualifying.create({ eventId, resultList: [] });
 

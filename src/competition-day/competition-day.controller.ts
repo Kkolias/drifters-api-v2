@@ -4,7 +4,9 @@ import competitionDayService from "./competition-day.service";
 export class QualifyingController {
   async createCompetitionDay(req: Request, res: Response) {
     try {
-      const output = await competitionDayService.handleCreateCompetitionDay(req);
+      const output = await competitionDayService.handleCreateCompetitionDay(
+        req
+      );
 
       res.status(201).json(output);
     } catch (error) {
@@ -52,8 +54,9 @@ export class QualifyingController {
 
   async addRunToHeat(req: Request, res: Response) {
     try {
-      const { success, error } =
-        await competitionDayService.handleAddRunToHeat(req);
+      const { success, error } = await competitionDayService.handleAddRunToHeat(
+        req
+      );
 
       if (error) {
         res.status(400).json(error);
@@ -79,6 +82,24 @@ export class QualifyingController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to update competition day data" });
+    }
+  }
+
+  async generateCompetitionDayFromResults(req: Request, res: Response) {
+    try {
+      const { success, error } =
+        await competitionDayService.handleGenerateCompetitionDayFromResultListForEvent(
+          req
+        );
+
+      if (error) {
+        res.status(400).json(error);
+      } else {
+        res.status(200).json(success);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to generate competition day" });
     }
   }
 }

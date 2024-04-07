@@ -13,7 +13,7 @@ export enum HeatType {
   top8 = "top8",
   top4 = "top4",
   final = "final",
-  bronze = "bronze"
+  bronze = "bronze",
 }
 
 export enum JudgePoint {
@@ -72,8 +72,8 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
         {
           type: { type: String, default: RunType.normal },
           runNumber: { type: Number, default: 0 },
-          leadDriverId: { type: String, required: true },
-          chaseDriverId: { type: String, required: true },
+          // leadDriverId: { type: String, required: true },
+          // chaseDriverId: { type: String, required: true },
           run1: {
             leadDriverId: { type: String, required: true },
             chaseDriverId: { type: String, required: true },
@@ -82,7 +82,7 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
             leadDriverId: { type: String, required: true },
             chaseDriverId: { type: String, required: true },
           },
-          
+
           judgePoint1: { type: String, default: null },
           judgePoint2: { type: String, default: null },
           judgePoint3: { type: String, default: null },

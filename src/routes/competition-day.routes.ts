@@ -9,6 +9,7 @@ router.post('/create', competitionDayController.createCompetitionDay)
 router.post('/create-heat-to-day', competitionDayController.addHeatToCompetitionDay)
 router.post('/add-run-to-heat', competitionDayController.addRunToHeat)
 router.post('/give-judge-points', competitionDayController.giveJudgePointsToRun)
+router.post('/generate-competition-day-from-results', competitionDayController.generateCompetitionDayFromResults)
 
 
 export = router
