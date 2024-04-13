@@ -43,12 +43,16 @@ export class CompetitionDayComputedUtil {
     }) as IComputedHeat[];
   }
 
-  private computeHeatWinnerId(heat: IHeat): IDriver | null {
+  // used in handleNewHeatOnJudging.ts
+  computeHeatWinnerId(heat: IHeat): IDriver | null {
     const runList = heat.runList;
-    const driver1 = heat.driver1;
-    const driver2 = heat.driver2;
+    const driver1 = heat?.driver1;
+    const driver2 = heat?.driver2;
 
     for (const run of runList) {
+      if(!driver1 || !driver2) {
+        return null;
+      }
       const winner = this.getWinnerIdOfRun(run, driver1, driver2);
 
       if (winner) {
@@ -115,31 +119,31 @@ export class CompetitionDayComputedUtil {
 
     const finalHeatWinner = finalHeat?.winner;
     const finalHeatLoser =
-      finalHeat?.driver1._id.toString() === finalHeatWinner?._id.toString()
+      finalHeat?.driver1?._id.toString() === finalHeatWinner?._id.toString()
         ? finalHeat?.driver2
         : finalHeat?.driver1;
 
     const thirdPlaceHeatWinner = thirdPlaceHeat?.winner;
     const thirdPlaceHeatLoser =
-      thirdPlaceHeat?.driver1._id.toString() ===
+      thirdPlaceHeat?.driver1?._id.toString() ===
       thirdPlaceHeatWinner?._id.toString()
         ? thirdPlaceHeat?.driver2
         : thirdPlaceHeat?.driver1;
 
     const top8HeatLosers = top8HeatList.map((heat) => {
-        return heat.driver1._id.toString() === heat.winner?._id.toString()
+        return heat.driver1?._id.toString() === heat.winner?._id.toString()
             ? heat.driver2
             : heat.driver1;
         });
 
     const top16HeatLosers = top16HeatList.map((heat) => {
-        return heat.driver1._id.toString() === heat.winner?._id.toString()
+        return heat.driver1?._id.toString() === heat.winner?._id.toString()
             ? heat.driver2
             : heat.driver1;
         });
     
     const top32HeatLosers = top32HeatList.map((heat) => {
-        return heat.driver1._id.toString() === heat.winner?._id.toString()
+        return heat.driver1?._id.toString() === heat.winner?._id.toString()
             ? heat.driver2
             : heat.driver1;
         });

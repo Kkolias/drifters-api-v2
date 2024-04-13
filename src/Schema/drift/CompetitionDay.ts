@@ -38,8 +38,8 @@ export interface IRunPairItem {
 }
 
 export interface IHeat extends Document {
-  driver1: IDriver;
-  driver2: IDriver;
+  driver1: IDriver | null;
+  driver2: IDriver | null;
   heatType: HeatType; // esim top32 top16 karsinnat
   bracketNumber: number; // vasen on 1-16 oikea 17-32 vasen 2 on 33-40 oikea 41-48 jne
   runList: IRunPairItem[];
@@ -59,12 +59,12 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
       driver1: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        required: true,
+        default: null
       },
       driver2: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        required: true,
+        default: null,
       },
       heatType: { type: String, default: "" },
       bracketNumber: { type: Number, default: 0 },

@@ -74,7 +74,8 @@ export class CreateCompetitionDayFromQualifyingResults {
     return heatList;
   }
 
-  private generateFirstRun(driver1: IDriver, driver2: IDriver): IRunPairItem {
+  // will be used in handleNewHeatOnJudging.ts
+  generateFirstRun(driver1: IDriver | null, driver2: IDriver | null): IRunPairItem {
     return {
       runNumber: 1,
       type: RunType.normal,

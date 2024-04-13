@@ -13,6 +13,7 @@ import competitionDayComputed, {
   ICompetitionDayComputed,
 } from "./computed/competition-day.computed";
 import util from "./utils/createCompetitionDayFromQualifyingResults";
+import { handleNewHeatOnJudging } from "./utils/handleNewHeatOnJudging";
 
 export class CompetitionDayService {
   async findAll(req: Request): Promise<ICompetitionDayItem[]> {
@@ -165,7 +166,7 @@ export class CompetitionDayService {
       judgePoint2: JudgePoint;
       judgePoint3: JudgePoint;
     }
-  ) {
+  ): Promise<ICompetitionDayItem | null> {
     const competitionDay = await CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId, "heatList.runList._id": runId },
       {
@@ -180,7 +181,9 @@ export class CompetitionDayService {
         arrayFilters: [{ "outer._id": heatId }, { "inner._id": runId }],
       }
     );
-    return competitionDay;
+    if (!competitionDay) return null;
+
+    return await handleNewHeatOnJudging(competitionDayId, heatId);
   }
 
   async handleGiveJudgePointsToRun(
