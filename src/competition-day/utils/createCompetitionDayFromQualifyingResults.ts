@@ -75,10 +75,10 @@ export class CreateCompetitionDayFromQualifyingResults {
   }
 
   // will be used in handleNewHeatOnJudging.ts
-  generateFirstRun(driver1: IDriver | null, driver2: IDriver | null): IRunPairItem {
+  generateFirstRun(driver1: IDriver | null, driver2: IDriver | null, type?: RunType, runNumber?: number): Partial<IRunPairItem> {
     return {
-      runNumber: 1,
-      type: RunType.normal,
+      runNumber: runNumber ?? 1,
+      type: type || RunType.normal,
       run1: {
         leadDriverId: driver1?._id,
         chaseDriverId: driver2?._id,

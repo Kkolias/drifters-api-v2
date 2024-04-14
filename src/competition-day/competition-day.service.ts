@@ -184,7 +184,7 @@ export class CompetitionDayService {
     );
     if (!competitionDay) return null;
 
-    return await handleNewHeatOnJudging(competitionDayId, heatId);
+    return await handleNewHeatOnJudging(competitionDayId, heatId, runId);
   }
 
   async handleGiveJudgePointsToRun(

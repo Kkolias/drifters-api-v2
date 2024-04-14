@@ -28,6 +28,7 @@ export interface IRunItem {
 }
 
 export interface IRunPairItem {
+  _id: string
   type: RunType;
   runNumber: number;
   run1: IRunItem;

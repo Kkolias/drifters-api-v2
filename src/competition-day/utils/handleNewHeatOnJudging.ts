@@ -10,6 +10,8 @@ import CompetitionDay, {
   HeatType,
   ICompetitionDayItem,
   IHeat,
+  JudgePoint,
+  RunType,
 } from "../../Schema/drift/CompetitionDay";
 import competitionDayUtil from "./createCompetitionDayFromQualifyingResults";
 import competitionDayComputedUtil from "../computed/competition-day.computed";
@@ -18,7 +20,8 @@ import { IDriver } from "../../Schema/drift/Driver";
 
 export async function handleNewHeatOnJudging(
   competitionDayId: string,
-  judgedHeatId: string
+  judgedHeatId: string,
+  runId: string
 ): Promise<any> {
   // find heat from competitionDay by id where heatList.heatId === judgedHeatId
   const competitionDay = await CompetitionDay.findById(competitionDayId)
@@ -32,6 +35,10 @@ export async function handleNewHeatOnJudging(
     (heat) => heat?._id?.toString() === judgedHeatId
   );
   if (!judgetHeat) return;
+
+  const omt = wasJudgetOneMoreTime(judgetHeat, runId);
+  if (omt)
+    return await handleAddOneMoreTimeRunToHeat(competitionDayId, judgetHeat);
 
   const bracketNumber = judgetHeat.bracketNumber;
   if (bracketNumber >= 31) return competitionDay;
@@ -49,12 +56,39 @@ export async function handleNewHeatOnJudging(
   }
 }
 
+function wasJudgetOneMoreTime(judgetHeat: IHeat, runId: string): boolean {
+  const run = judgetHeat.runList.find((run) => run?._id?.toString() === runId);
+  if (!run) return false;
+
+  // if alteast 2 judgePoints are 'omt'
+  // or if all are different
+  const omtCount = [run.judgePoint1, run.judgePoint2, run.judgePoint3]?.filter(
+    (i) => i === JudgePoint.omt
+  )?.length;
+
+  const allDifferent =
+    run.judgePoint1 !== run.judgePoint2 &&
+    run.judgePoint2 !== run.judgePoint3 &&
+    run.judgePoint1 !== run.judgePoint3;
+  return omtCount >= 2 || allDifferent;
+}
+
+async function findById(
+  competitionDayId: string
+): Promise<ICompetitionDayItem | null> {
+  return await CompetitionDay.findById(competitionDayId)
+    .lean()
+    .populate("heatList.runList")
+    .populate("heatList.driver1")
+    .populate("heatList.driver2");
+}
+
 async function handleCreateNewHeat(
   competitionDayId: string,
   judgetHeat: IHeat
 ): Promise<ICompetitionDayItem | null> {
   const newHeat = await generateHeat(competitionDayId, judgetHeat);
-  if (!newHeat) return null;
+  if (!newHeat) return await findById(competitionDayId);
 
   // save new heat to competitionDay
   return await CompetitionDay.findOneAndUpdate(
@@ -80,6 +114,7 @@ function heatTypeToNextHeatType(heatType: HeatType): HeatType {
 // bracketNumberToNextBracketNumber function works:
 // 1 -> 17 | 3 -> 18 | 5 -> 19 | 7 -> 20 | 9 -> 21 | 11 -> 22 | 13 -> 23 | 15 -> 24
 function bracketNumberToNextBracketNumber(bracketNumber: number): number {
+  console.log(bracketNumber)
   switch (bracketNumber) {
     case 1:
       return 17;
@@ -97,6 +132,18 @@ function bracketNumberToNextBracketNumber(bracketNumber: number): number {
       return 23;
     case 15:
       return 24;
+    case 17:
+      return 25;
+    case 19:
+      return 26;
+    case 21:
+      return 27;
+    case 23:
+      return 28;
+    case 25:
+      return 29;
+    case 27:
+      return 30;
     default:
       return 0;
   }
@@ -312,4 +359,25 @@ async function isHeatForBracketNumberCreated(
     "heatList.bracketNumber": bracketNumber,
   });
   return !!found;
+}
+
+// section for creating new run to heat.runList for one more time
+async function handleAddOneMoreTimeRunToHeat(
+  competitionDayId: string,
+  judgetHeat: IHeat
+): Promise<ICompetitionDayItem | null> {
+  const runNumber = judgetHeat.runList.length + 1;
+  const newRun = competitionDayUtil.generateFirstRun(
+    judgetHeat.driver1,
+    judgetHeat.driver2,
+    RunType.omt,
+    runNumber
+  );
+  const updatedHeat = await CompetitionDay.findOneAndUpdate(
+    { _id: competitionDayId, "heatList._id": judgetHeat._id },
+    { $push: { "heatList.$.runList": newRun } },
+    { new: true }
+  );
+
+  return updatedHeat;
 }
