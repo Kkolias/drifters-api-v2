@@ -102,6 +102,24 @@ export class QualifyingController {
       res.status(500).json({ error: "Failed to generate competition day" });
     }
   }
+
+  async updateHeat(req: Request, res: Response) {
+    try {
+      const { success, error } =
+        await competitionDayService.handleUpdateHeat(
+          req
+        );
+
+      if (error) {
+        res.status(400).json(error);
+      } else {
+        res.status(200).json(success);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to update competition day" });
+    }
+  }
 }
 
 export default new QualifyingController();

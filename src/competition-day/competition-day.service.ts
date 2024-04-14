@@ -1,4 +1,5 @@
 import CompetitionDay, {
+  HeatType,
   ICompetitionDayItem,
   IHeat,
   IRunItem,
@@ -221,6 +222,84 @@ export class CompetitionDayService {
       return { error: "Error creating competition day", success: null };
 
     return { success: created };
+  }
+
+  async updateHeat({
+    competitionDayId,
+    heatId,
+    bracketNumber,
+    heatType,
+    driver1Id,
+    driver2Id,
+  }: {
+    competitionDayId: string;
+    heatId: string;
+    bracketNumber: number;
+    heatType: HeatType;
+    driver1Id: string;
+    driver2Id: string;
+  }): Promise<ICompetitionDayItem | null> {
+    const [driver1, driver2] = await Promise.all([
+      driverService.findById(driver1Id),
+      driverService.findById(driver2Id),
+    ]);
+
+    if (!driver1 || !driver2) return null;
+
+    // const updatedHeat = {
+    //   bracketNumber,
+    //   heatType,
+    //   driver1,
+    //   driver2,
+    // };
+
+    return await CompetitionDay.findOneAndUpdate(
+      { _id: competitionDayId, "heatList._id": heatId },
+      {
+        $set: {
+          "heatList.$[heatElem].bracketNumber": bracketNumber,
+          "heatList.$[heatElem].heatType": heatType,
+          "heatList.$[heatElem].driver1": driver1,
+          "heatList.$[heatElem].driver2": driver2,
+          "heatList.$[heatElem].runList.0.run1.leadDriverId": driver1?._id,
+          "heatList.$[heatElem].runList.0.run1.chaseDriverId": driver2?._id,
+          "heatList.$[heatElem].runList.0.run2.chaseDriverId": driver1?._id,
+          "heatList.$[heatElem].runList.0.run2.leadDriverId": driver2?._id,
+        },
+      },
+      {
+        arrayFilters: [
+          { "heatElem._id": heatId }, // Match heatList element by _id
+        ],
+        new: true,
+      }
+    );
+  }
+
+  async handleUpdateHeat(
+    req: Request
+  ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
+    const {
+      competitionDayId,
+      heatId,
+      bracketNumber,
+      heatType,
+      driver1Id,
+      driver2Id,
+    } = req.body;
+    const updated = await this.updateHeat({
+      competitionDayId,
+      heatId,
+      bracketNumber,
+      heatType,
+      driver1Id,
+      driver2Id,
+    });
+
+    if (!updated)
+      return { error: "Error updating competition day", success: null };
+
+    return { success: updated };
   }
 }
 

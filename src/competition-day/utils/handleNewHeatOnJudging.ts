@@ -34,6 +34,7 @@ export async function handleNewHeatOnJudging(
   if (!judgetHeat) return;
 
   const bracketNumber = judgetHeat.bracketNumber;
+  if (bracketNumber >= 31) return competitionDay;
   if (bracketNumber === 29 || bracketNumber === 30)
     return await handleJudgetTop4Heat(competitionDayId, judgetHeat);
 
@@ -52,7 +53,8 @@ async function handleCreateNewHeat(
   competitionDayId: string,
   judgetHeat: IHeat
 ): Promise<ICompetitionDayItem | null> {
-  const newHeat = generateHeat(judgetHeat);
+  const newHeat = await generateHeat(competitionDayId, judgetHeat);
+  if (!newHeat) return null;
 
   // save new heat to competitionDay
   return await CompetitionDay.findOneAndUpdate(
@@ -100,11 +102,22 @@ function bracketNumberToNextBracketNumber(bracketNumber: number): number {
   }
 }
 
-function generateHeat(judgetHeat: IHeat): IHeat {
+async function generateHeat(
+  competitionDayId: string,
+  judgetHeat: IHeat
+): Promise<IHeat | null> {
   const newHeatType = heatTypeToNextHeatType(judgetHeat.heatType);
   const newBracketNumber = bracketNumberToNextBracketNumber(
     judgetHeat.bracketNumber
   );
+
+  const isBracketAlreadyCreated = await isHeatForBracketNumberCreated(
+    competitionDayId,
+    newBracketNumber
+  );
+  if (isBracketAlreadyCreated) {
+    return null;
+  }
 
   const driver1 = competitionDayComputedUtil.computeHeatWinnerId(judgetHeat);
   const driver2 = null;
@@ -201,18 +214,18 @@ async function handleCreateFinalAndBronze(
       : judgetHeat.driver1
   ) as IDriver;
 
-  const finalHeat = generateHeatFinalOrBronze(
+  const finalHeat = await generateHeatFinalOrBronze(
+    competitionDayId,
     winner,
-    judgetHeat,
     HeatType.final
   );
-  const bronzeHeat = generateHeatFinalOrBronze(
+  const bronzeHeat = await generateHeatFinalOrBronze(
+    competitionDayId,
     loser,
-    judgetHeat,
     HeatType.bronze
   );
 
-  const heatList = [finalHeat, bronzeHeat];
+  const heatList = [finalHeat, bronzeHeat]?.filter((i) => i);
 
   // save new heats to competitionDay
   return await CompetitionDay.findOneAndUpdate(
@@ -222,12 +235,18 @@ async function handleCreateFinalAndBronze(
   );
 }
 
-function generateHeatFinalOrBronze(
+async function generateHeatFinalOrBronze(
+  competitionDayId: string,
   driver1: IDriver,
-  judgetHeat: IHeat,
   heatType: HeatType.final | HeatType.bronze
-): IHeat {
+): Promise<IHeat | null> {
   const newBracketNumber = heatType === HeatType.final ? 32 : 31;
+
+  const isBracketAlreadyCreated = await isHeatForBracketNumberCreated(
+    competitionDayId,
+    newBracketNumber
+  );
+  if (isBracketAlreadyCreated) return null;
 
   return {
     driver1, // this is lead driver
@@ -281,4 +300,16 @@ async function handleAddDriversToFinalAndBronze(
     .populate("heatList.runList")
     .populate("heatList.driver1")
     .populate("heatList.driver2");
+}
+
+async function isHeatForBracketNumberCreated(
+  competitionDayId: string,
+  bracketNumber: number
+): Promise<boolean> {
+  // find heat from competitionDay by id where heatList has item with bracketNumber
+  const found = await CompetitionDay.findOne({
+    _id: competitionDayId,
+    "heatList.bracketNumber": bracketNumber,
+  });
+  return !!found;
 }
