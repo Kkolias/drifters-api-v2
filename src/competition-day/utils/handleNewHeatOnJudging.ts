@@ -114,7 +114,6 @@ function heatTypeToNextHeatType(heatType: HeatType): HeatType {
 // bracketNumberToNextBracketNumber function works:
 // 1 -> 17 | 3 -> 18 | 5 -> 19 | 7 -> 20 | 9 -> 21 | 11 -> 22 | 13 -> 23 | 15 -> 24
 function bracketNumberToNextBracketNumber(bracketNumber: number): number {
-  console.log(bracketNumber)
   switch (bracketNumber) {
     case 1:
       return 17;
@@ -198,6 +197,18 @@ function getNextBracketNumberForChaseDriver(judgetHeat: IHeat): number {
       return 23;
     case 16:
       return 24;
+    case 18:
+      return 25;
+    case 20:
+      return 26;
+    case 22:
+      return 27;
+    case 24:
+      return 28;
+    case 26:
+      return 29;
+    case 28:
+      return 30;
     default:
       return 0;
   }

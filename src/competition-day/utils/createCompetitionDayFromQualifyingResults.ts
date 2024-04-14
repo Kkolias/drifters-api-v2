@@ -66,7 +66,7 @@ export class CreateCompetitionDayFromQualifyingResults {
         driver1, // this is lead driver
         driver2, // this is chase driver
         heatType: HeatType.top32,
-        bracketNumber: 0,
+        bracketNumber: i + 1,
         runList: [this.generateFirstRun(driver1, driver2)],
       } as IHeat;
       heatList.push(heat);
