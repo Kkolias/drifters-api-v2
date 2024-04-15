@@ -25,9 +25,13 @@ class QualifyingService {
   }
 
   async findById(id: string): Promise<IQualifyingComputedItem | null> {
-    const qualifying = await Qualifying.findById(id);
+    const qualifying = await Qualifying.findById(id).lean();
+    let event = null
+    if(qualifying) {
+      event = await driftEventService.findById(qualifying?.eventId);
+    }
     if (!qualifying) return null;
-    return qualifyingCompute.getOutputQualifying(qualifying);
+    return qualifyingCompute.getOutputQualifying({...qualifying, event});
   }
 
   async findByEventIdCompted(

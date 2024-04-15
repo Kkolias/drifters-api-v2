@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IDriver } from "./Driver";
+import { IDriftEventSchema } from "./DriftEvent";
 
 export interface IQualifyingSchemaRun {
   line: number | null
@@ -16,6 +17,7 @@ export interface IQualifyingResultItem extends Document {
 
 export interface IQualifyingSchemaItem extends Document {
   eventId: string
+  event?: IDriftEventSchema | null
   resultList: IQualifyingResultItem[]
   createdAt: Date
 }
