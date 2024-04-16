@@ -28,9 +28,13 @@ export class CompetitionDayService {
       .lean()
       .populate("heatList.driver1")
       .populate("heatList.driver2");
+      let event = null
+      if(competitionDay) {
+        event = await driftEventService.findById(competitionDay?.eventId);
+      }
     if (!competitionDay) return null;
 
-    return competitionDayComputed.computeCompetitionDay(competitionDay);
+    return competitionDayComputed.computeCompetitionDay({...competitionDay, event});
   }
 
   async createCompetitionDay(eventId: string): Promise<ICompetitionDayItem> {

@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IDriver } from "./Driver";
+import { IDriftEventSchema } from "./DriftEvent";
 
 export enum RunType {
   omt = "omt", // one more time
@@ -48,6 +49,7 @@ export interface IHeat extends Document {
 
 export interface ICompetitionDayItem extends Document {
   eventId: string;
+  event?: IDriftEventSchema | null;
   heatList: IHeat[];
   createdAt: Date;
 }
