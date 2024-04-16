@@ -13,6 +13,7 @@ export interface IDriver extends Document {
   firstName: string;
   lastName: string;
   age: number
+  raceNumber: number | null;
   createdAt: Date;
   cars: ICar[]
 }
@@ -21,6 +22,7 @@ const DriverShcema = new Schema<IDriver>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   age: { type: Number, required: false },
+  raceNumber: { type: Number, default: null },
   createdAt: { type: Date, default: () => Date.now() },
   cars: [
     {
