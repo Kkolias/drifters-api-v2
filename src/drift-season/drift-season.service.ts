@@ -21,7 +21,7 @@ export class DriftSeasonService {
   }
 
   async findById(id: string): Promise<IDriftSeason | null> {
-    return await DriftSeason.findById(id).populate("driftEvents");
+    return await DriftSeason.findById(id).populate("driftEvents").populate("leaderboard");
   }
 
   async createDriftSeason({

@@ -49,6 +49,38 @@ export class DriftEventController {
       res.status(500).json({ error: "Failed to update drift event data" });
     }
   }
+
+  async handleQualifyingScoring(req: Request, res: Response) {
+    try {
+      const { success, error } =
+        await driftEventService.handleQualifyingScoring(req);
+
+      if (error) {
+        res.status(400).json(error);
+      } else {
+        res.status(200).json(success);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to update drift event data" });
+    }
+  }
+
+  async handleCompetitionDayScoring(req: Request, res: Response) {
+    try {
+      const { success, error } =
+        await driftEventService.handleCompetitionDayScoring(req);
+
+      if (error) {
+        res.status(400).json(error);
+      } else {
+        res.status(200).json(success);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to update drift event data" });
+    }
+  }
 }
 
 export default new DriftEventController();

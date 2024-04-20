@@ -1,5 +1,7 @@
 import DriftEvent, { IDriftEventSchema } from "../Schema/drift/DriftEvent";
 import driftSeasonService from "../drift-season/drift-season.service";
+import { handleCompetitionDayScoring } from "../leaderboard/utils/handleBattlesLeaderboars";
+import { handleQualifyingScoring } from "../leaderboard/utils/handleQualifyingLeaderboard";
 import qualifyingService from "../qualifying/qualifying.service";
 import { isAdmin } from "../user/utils/isAdmin";
 import { Request } from "express";
@@ -13,7 +15,10 @@ export class DriftEventService {
 
   async findById(id: string): Promise<IDriftEventSchema | null> {
     // populate qualifying and competitionDay
-    return await DriftEvent.findById(id).populate("qualifying").populate("competitionDay").exec();
+    return await DriftEvent.findById(id)
+      .populate("qualifying")
+      .populate("competitionDay")
+      .exec();
   }
 
   async createDriftEvent(payload: {
@@ -82,6 +87,34 @@ export class DriftEventService {
 
     if (!qualifying) return { error: "updating event failed", success: null };
     return { error: "", success: qualifying };
+  }
+
+  async handleQualifyingScoring(
+    req: Request
+  ): Promise<{ error: string; success: IDriftEventSchema | null }> {
+    const { eventId } = req.body;
+
+    await handleQualifyingScoring({
+      eventId,
+    });
+    const updatedEvent = await this.findById(eventId);
+
+    if (!updatedEvent) return { error: "scoring failed", success: null };
+    return { error: "", success: updatedEvent };
+  }
+
+  async handleCompetitionDayScoring(
+    req: Request
+  ): Promise<{ error: string; success: IDriftEventSchema | null }> {
+    const { eventId } = req.body;
+
+    await handleCompetitionDayScoring({
+      eventId,
+    });
+    const updatedEvent = await this.findById(eventId);
+
+    if (!updatedEvent) return { error: "scoring failed", success: null };
+    return { error: "", success: updatedEvent };
   }
 }
 

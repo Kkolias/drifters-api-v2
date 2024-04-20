@@ -28,13 +28,26 @@ export class CompetitionDayService {
       .lean()
       .populate("heatList.driver1")
       .populate("heatList.driver2");
-      let event = null
-      if(competitionDay) {
-        event = await driftEventService.findById(competitionDay?.eventId);
-      }
+    let event = null;
+    if (competitionDay) {
+      event = await driftEventService.findById(competitionDay?.eventId);
+    }
     if (!competitionDay) return null;
 
-    return competitionDayComputed.computeCompetitionDay({...competitionDay, event});
+    return competitionDayComputed.computeCompetitionDay({
+      ...competitionDay,
+      event,
+    });
+  }
+
+  async findByEventId(eventId: string): Promise<ICompetitionDayItem | null> {
+    const competitionDay = await CompetitionDay.findOne({ eventId })
+      .lean()
+      .populate("heatList.driver1")
+      .populate("heatList.driver2");
+    if (!competitionDay) return null;
+
+    return competitionDayComputed.computeCompetitionDay(competitionDay);
   }
 
   async createCompetitionDay(eventId: string): Promise<ICompetitionDayItem> {

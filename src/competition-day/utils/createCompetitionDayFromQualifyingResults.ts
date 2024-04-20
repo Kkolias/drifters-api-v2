@@ -20,7 +20,7 @@ import qualifyingService from "../../qualifying/qualifying.service";
 
 export class CreateCompetitionDayFromQualifyingResults {
   async execute(eventId: string): Promise<ICompetitionDayItem> {
-    const qualifying = await qualifyingService.findByEventIdCompted(eventId);
+    const qualifying = await qualifyingService.findByEventIdComputed(eventId);
 
     const resultList = qualifying?.resultList || []; // this is sorted already
     // sort resultList by highestPoints
