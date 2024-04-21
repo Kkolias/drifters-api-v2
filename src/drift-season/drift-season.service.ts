@@ -20,6 +20,10 @@ export class DriftSeasonService {
       .exec();
   }
 
+  async findAllLight(): Promise<IDriftSeason[]> {
+    return await DriftSeason.find().exec();
+  }
+
   async findById(id: string): Promise<IDriftSeason | null> {
     return await DriftSeason.findById(id)
       .populate("driftEvents")

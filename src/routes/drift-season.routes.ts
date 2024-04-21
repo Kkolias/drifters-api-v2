@@ -7,19 +7,20 @@ router.get("/get-by-id", driftSeasonController.getById);
 router.post("/create-drift-season", driftSeasonController.createDriftSeason);
 router.post(
   "/add-driver-to-season",
-  driftSeasonController.addDriverToDriftSeason,
+  driftSeasonController.addDriverToDriftSeason
 );
 router.post(
   "/add-many-drivers-to-season",
-  driftSeasonController.addManyDriversToDriftSeason,
+  driftSeasonController.addManyDriversToDriftSeason
 );
 router.post(
   "/add-leaderboard-to-season",
-  driftSeasonController.addLeaderboardToDriftSeason,
+  driftSeasonController.addLeaderboardToDriftSeason
 );
 router.post(
   "/add-event-to-season",
-  driftSeasonController.addEventToDriftSeason,
+  driftSeasonController.addEventToDriftSeason
 );
+router.get("/find-all-light", driftSeasonController.findAllLight);
 
 export = router;
