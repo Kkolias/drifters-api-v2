@@ -50,9 +50,10 @@ export class CompetitionDayService {
     return competitionDayComputed.computeCompetitionDay(competitionDay);
   }
 
-  async createCompetitionDay(eventId: string): Promise<ICompetitionDayItem> {
+  async createCompetitionDay(eventId: string, date: Date): Promise<ICompetitionDayItem> {
     const competitionDay = await CompetitionDay.create({
       eventId,
+      date,
       resultList: [],
     });
 
@@ -69,8 +70,8 @@ export class CompetitionDayService {
   async handleCreateCompetitionDay(
     req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
-    const { eventId } = req.body;
-    const competitionDay = await this.createCompetitionDay(eventId);
+    const { eventId, date } = req.body;
+    const competitionDay = await this.createCompetitionDay(eventId, date);
     if (!competitionDay)
       return { error: "Error creating competition day", success: null };
 

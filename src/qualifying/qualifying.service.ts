@@ -42,8 +42,8 @@ class QualifyingService {
     return qualifyingCompute.getOutputQualifying(qualifying);
   }
 
-  async createQualifying(eventId: string): Promise<IQualifyingSchemaItem> {
-    const qualifying = await Qualifying.create({ eventId, resultList: [] });
+  async createQualifying(eventId: string, date: Date): Promise<IQualifyingSchemaItem> {
+    const qualifying = await Qualifying.create({ eventId, date, resultList: [] });
 
     const driftEvent = await driftEventService.findById(eventId);
 
@@ -58,13 +58,13 @@ class QualifyingService {
   async handleCreateQualifying(
     req: Request
   ): Promise<IQualifyingSchemaItem | null> {
-    const { eventId } = req.body;
+    const { eventId, date } = req.body;
 
     if (!(await isAdmin(req))) {
       return null;
     }
 
-    return await this.createQualifying(eventId);
+    return await this.createQualifying(eventId, date);
   }
 
   // Method to create a new QualifyingResultItem and add it to the resultList of a Qualifying

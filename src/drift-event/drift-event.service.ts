@@ -25,6 +25,8 @@ export class DriftEventService {
     seasonId: string;
     name: string;
     country: string;
+    city: string;
+    track: string;
     startsAt: Date;
     endsAt: Date;
   }): Promise<IDriftEventSchema> {
@@ -43,7 +45,7 @@ export class DriftEventService {
   async handleCreateDriftEvent(
     req: Request
   ): Promise<IDriftEventSchema | null> {
-    const { seasonId, name, country, startsAt, endsAt } = req.body;
+    const { seasonId, name, country, city, track, startsAt, endsAt } = req.body;
 
     if (!(await isAdmin(req))) {
       return null;
@@ -53,6 +55,8 @@ export class DriftEventService {
       seasonId,
       name,
       country,
+      city,
+      track,
       startsAt,
       endsAt,
     });

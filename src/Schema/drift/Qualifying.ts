@@ -19,12 +19,14 @@ export interface IQualifyingSchemaItem extends Document {
   eventId: string
   event?: IDriftEventSchema | null
   resultList: IQualifyingResultItem[]
+  date: Date | null
   createdAt: Date
 }
 
 
 const QualifyingSchema = new Schema<IQualifyingSchemaItem>({
   eventId: { type: String, required: true },
+  date: { type: Date, default: null },
   createdAt: { type: Date, default: () => Date.now() },
   resultList: [
     {

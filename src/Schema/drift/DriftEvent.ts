@@ -6,6 +6,8 @@ import { ICompetitionDayItem } from "./CompetitionDay";
 export interface IDriftEventSchema extends Document {
   seasonId: string;
   country: string;
+  city: string;
+  track: string;
   name: string;
   startsAt: Date;
   endsAt: Date;
@@ -19,6 +21,8 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   startsAt: { type: Date, default: null },
   endsAt: { type: Date, default: null },
   country: { type: String, required: true },
+  city: { type: String, default: '' },
+  track: { type: String, required: true },
   name: { type: String, required: true },
   seasonId: { type: String, required: true },
   qualifying: {

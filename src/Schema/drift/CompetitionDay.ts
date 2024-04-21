@@ -51,11 +51,13 @@ export interface ICompetitionDayItem extends Document {
   eventId: string;
   event?: IDriftEventSchema | null;
   heatList: IHeat[];
+  date: Date | null;
   createdAt: Date;
 }
 
 const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
   eventId: { type: String, required: true },
+  date: { type: Date, default: null },
   createdAt: { type: Date, default: () => Date.now() },
   heatList: [
     {
