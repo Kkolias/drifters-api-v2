@@ -27,7 +27,7 @@ const LeaderboardSchema = new Schema<ILeaderboard>({
       driver: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        required: true
+        required: true,
       },
       score: { type: Number, default: 0 },
       numOfWins: { type: Number, default: 0 },
@@ -39,7 +39,7 @@ const LeaderboardSchema = new Schema<ILeaderboard>({
 
 const Leaderboard = mongoose.model<ILeaderboard>(
   "Leaderboard",
-  LeaderboardSchema
+  LeaderboardSchema,
 );
 
 export default Leaderboard;

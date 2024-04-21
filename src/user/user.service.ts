@@ -14,20 +14,20 @@ export class UserService {
     password,
     firstName,
     lastName,
-    role
+    role,
   }: {
     email: string;
     password: string;
     firstName: string;
     lastName: string;
-    role?: UserRoles
+    role?: UserRoles;
   }): Promise<{ error: string; success: string }> {
     if (!email || !password || !firstName || !lastName) {
       return { error: "error creating user", success: "" };
     }
 
-    const existingUser = await User.findOne({ email })
-    if(existingUser) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return { error: "email in use", success: "" };
     }
 
@@ -43,7 +43,7 @@ export class UserService {
 
     const token = jwt.sign(
       { id: newUser._id, email: newUser.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
 
     return { error: "", success: token };
@@ -72,34 +72,36 @@ export class UserService {
     return { error: "", success: token };
   }
 
-  async updateRole(req: Request): Promise<{ user: IUser | null, error: string}> {
-    const isUserAdmin = await isAdmin(req)
-    if(!isUserAdmin) {
-      return { user: null, error: 'no permission'}
+  async updateRole(
+    req: Request,
+  ): Promise<{ user: IUser | null; error: string }> {
+    const isUserAdmin = await isAdmin(req);
+    if (!isUserAdmin) {
+      return { user: null, error: "no permission" };
     }
 
-    const { role, id } = req.body
+    const { role, id } = req.body;
 
-    const user = await User.findOne({ _id: id})
-    console.log("USER", user)
+    const user = await User.findOne({ _id: id });
+    console.log("USER", user);
 
-    if(!user) return { user: null, error: 'no user found'}
+    if (!user) return { user: null, error: "no user found" };
 
-    user.role = role
+    user.role = role;
 
-    const output = await user.save()
-    return { user: output, error: ''}
+    const output = await user.save();
+    return { user: output, error: "" };
   }
 
   async getUserByToken(req: Request): Promise<IUser | null> {
     if (req.headers && req.headers.authorization) {
       const rawToken = req.headers.authorization;
-      const token = parseToken(rawToken) 
+      const token = parseToken(rawToken);
 
       const { user, error } = await fetchUserByToken(token);
 
-      if(error) {
-        return null
+      if (error) {
+        return null;
       }
 
       if (user) {
@@ -107,7 +109,7 @@ export class UserService {
       }
       return null;
     }
-    return null
+    return null;
   }
 }
 

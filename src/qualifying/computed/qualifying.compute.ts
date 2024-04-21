@@ -16,7 +16,7 @@ export interface IQualifyingComputedItem extends IQualifyingSchemaItem {
 
 export class QualifyingComputedUtil {
   getOutputQualifyingList(
-    qualifyingList: IQualifyingSchemaItem[]
+    qualifyingList: IQualifyingSchemaItem[],
   ): IQualifyingComputedItem[] {
     return qualifyingList.map((qualifyingItem) => {
       return this.getOutputQualifying(qualifyingItem);
@@ -24,7 +24,7 @@ export class QualifyingComputedUtil {
   }
 
   getOutputQualifying(
-    qualifyingItem: IQualifyingSchemaItem
+    qualifyingItem: IQualifyingSchemaItem,
   ): IQualifyingComputedItem {
     const qualifyingWithComputedFields =
       this.qualifyingWithComputedFields(qualifyingItem);
@@ -32,7 +32,7 @@ export class QualifyingComputedUtil {
   }
 
   qualifyingListWithComputedFields(
-    qualifyingList: IQualifyingSchemaItem[]
+    qualifyingList: IQualifyingSchemaItem[],
   ): IQualifyingComputedItem[] {
     return qualifyingList.map((qualifyingItem) => {
       return this.qualifyingWithComputedFields(qualifyingItem);
@@ -40,7 +40,7 @@ export class QualifyingComputedUtil {
   }
 
   qualifyingWithComputedFields(
-    qualifyingItem: IQualifyingSchemaItem
+    qualifyingItem: IQualifyingSchemaItem,
   ): IQualifyingComputedItem {
     const resultList = this.computeResultList(qualifyingItem.resultList);
     return {
@@ -50,7 +50,7 @@ export class QualifyingComputedUtil {
   }
 
   private computeResultList(
-    resultList: IQualifyingResultItem[]
+    resultList: IQualifyingResultItem[],
   ): IQualifyingComputedResultItem[] {
     return resultList.map((resultItem) => {
       const run1Points = this.computeRunPoints(resultItem.run1);
@@ -71,7 +71,7 @@ export class QualifyingComputedUtil {
   }
 
   getQualifyingListWithOrderedResultList(
-    qualifyingList: IQualifyingComputedItem[]
+    qualifyingList: IQualifyingComputedItem[],
   ): IQualifyingComputedItem[] {
     return qualifyingList.map((qualifying) => {
       return this.getQualifyingWitOrderedResultList(qualifying);
@@ -79,7 +79,7 @@ export class QualifyingComputedUtil {
   }
 
   getQualifyingWitOrderedResultList(
-    qualifying: IQualifyingComputedItem
+    qualifying: IQualifyingComputedItem,
   ): IQualifyingComputedItem {
     const resultList = qualifying.resultList.sort((a, b) => {
       if (b.highestPoints === a.highestPoints) {
@@ -95,7 +95,7 @@ export class QualifyingComputedUtil {
 
   private handleSortTieBreaker(
     resultA: IQualifyingComputedResultItem,
-    resultB: IQualifyingComputedResultItem
+    resultB: IQualifyingComputedResultItem,
   ): number {
     // tie breaker 1 higher score in lower scored run. Example resultA run1Points: 50, run2Points: 40
     // resultB run1Points: 30, run2Points: 55 -> we take lowest runs and compare them

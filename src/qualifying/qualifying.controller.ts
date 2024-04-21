@@ -43,9 +43,8 @@ export class QualifyingController {
       if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const { success, error } = await qualifyingService.handleCreateResultItem(
-        req
-      );
+      const { success, error } =
+        await qualifyingService.handleCreateResultItem(req);
 
       if (error) {
         res.status(400).json(error);

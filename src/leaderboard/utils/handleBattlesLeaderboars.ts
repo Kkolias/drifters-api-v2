@@ -12,18 +12,18 @@ import {
 } from "../../competition-day/computed/competition-day.computed";
 
 async function getLeaderboardBySeasonId(
-  seasonId: string
+  seasonId: string,
 ): Promise<ILeaderboard> {
   return (await Leaderboard.findOne({ seasonId }).populate(
-    "scoreboard.driver"
+    "scoreboard.driver",
   )) as ILeaderboard;
 }
 
 async function getCompetitionDayByEventId(
-  eventId: string
+  eventId: string,
 ): Promise<ICompetitionDayComputed> {
   return (await competitionDayService.findByEventId(
-    eventId
+    eventId,
   )) as ICompetitionDayComputed;
 }
 
@@ -79,7 +79,7 @@ export async function handleCompetitionDayScoring({
     const score = getPointsForPosition(result);
 
     const scoreboardItem = leaderboard.scoreboard.find(
-      (item) => item.driver._id.toString() === driver?._id.toString()
+      (item) => item.driver._id.toString() === driver?._id.toString(),
     );
 
     if (scoreboardItem) {

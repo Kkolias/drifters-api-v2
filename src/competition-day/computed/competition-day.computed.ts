@@ -1,5 +1,5 @@
 import {
-    HeatType,
+  HeatType,
   ICompetitionDayItem,
   IHeat,
   IRunItem,
@@ -24,7 +24,7 @@ export interface ICompetitionDayComputed extends ICompetitionDayItem {
 
 export class CompetitionDayComputedUtil {
   getCompetitionDayWithWinners(
-    competitionDay: ICompetitionDayItem
+    competitionDay: ICompetitionDayItem,
   ): ICompetitionDayComputed {
     const heatList = this.getHeatListWithWinners(competitionDay.heatList);
     return {
@@ -50,7 +50,7 @@ export class CompetitionDayComputedUtil {
     const driver2 = heat?.driver2;
 
     for (const run of runList) {
-      if(!driver1 || !driver2) {
+      if (!driver1 || !driver2) {
         return null;
       }
       const winner = this.getWinnerIdOfRun(run, driver1, driver2);
@@ -65,11 +65,25 @@ export class CompetitionDayComputedUtil {
     return null; // No winner yet
   }
 
-  private getWinnerIdOfRun(run: IRunPairItem, driver1: IDriver, driver2: IDriver): IDriver | null {
-    const driver1Count = [run.judgePoint1, run.judgePoint2, run.judgePoint3].filter(point => point === "driver1").length
-    const driver2Count = [run.judgePoint1, run.judgePoint2, run.judgePoint3].filter(point => point === "driver2").length
-    const omtCount = [run.judgePoint1, run.judgePoint2, run.judgePoint3].filter(point => point === "omt").length
-  
+  private getWinnerIdOfRun(
+    run: IRunPairItem,
+    driver1: IDriver,
+    driver2: IDriver,
+  ): IDriver | null {
+    const driver1Count = [
+      run.judgePoint1,
+      run.judgePoint2,
+      run.judgePoint3,
+    ].filter((point) => point === "driver1").length;
+    const driver2Count = [
+      run.judgePoint1,
+      run.judgePoint2,
+      run.judgePoint3,
+    ].filter((point) => point === "driver2").length;
+    const omtCount = [run.judgePoint1, run.judgePoint2, run.judgePoint3].filter(
+      (point) => point === "omt",
+    ).length;
+
     if (driver1Count >= 2) {
       return driver1;
     }
@@ -83,10 +97,13 @@ export class CompetitionDayComputedUtil {
   }
 
   public computeCompetitionDay(
-    competitionDay: ICompetitionDayItem
+    competitionDay: ICompetitionDayItem,
   ): ICompetitionDayComputed {
-    const competitionDayWithHeatWinners = this.getCompetitionDayWithWinners(competitionDay)
-    const scoreBoard = this.computeScoreBoard(competitionDayWithHeatWinners.heatList);
+    const competitionDayWithHeatWinners =
+      this.getCompetitionDayWithWinners(competitionDay);
+    const scoreBoard = this.computeScoreBoard(
+      competitionDayWithHeatWinners.heatList,
+    );
     return {
       ...competitionDayWithHeatWinners,
       scoreBoard,
@@ -105,16 +122,16 @@ export class CompetitionDayComputedUtil {
     const scoreBoard: IScoreBoardItem[] = [];
     const finalHeat = heatList.find((heat) => heat.heatType === HeatType.final);
     const thirdPlaceHeat = heatList.find(
-      (heat) => heat.heatType === HeatType.bronze
+      (heat) => heat.heatType === HeatType.bronze,
     );
     const top8HeatList = heatList.filter(
-      (heat) => heat.heatType === HeatType.top8
+      (heat) => heat.heatType === HeatType.top8,
     );
     const top16HeatList = heatList.filter(
-      (heat) => heat.heatType === HeatType.top16
+      (heat) => heat.heatType === HeatType.top16,
     );
     const top32HeatList = heatList.filter(
-      (heat) => heat.heatType === HeatType.top32
+      (heat) => heat.heatType === HeatType.top32,
     );
 
     const finalHeatWinner = finalHeat?.winner;
@@ -131,50 +148,50 @@ export class CompetitionDayComputedUtil {
         : thirdPlaceHeat?.driver1;
 
     const top8HeatLosers = top8HeatList.map((heat) => {
-        return heat.driver1?._id.toString() === heat.winner?._id.toString()
-            ? heat.driver2
-            : heat.driver1;
-        });
+      return heat.driver1?._id.toString() === heat.winner?._id.toString()
+        ? heat.driver2
+        : heat.driver1;
+    });
 
     const top16HeatLosers = top16HeatList.map((heat) => {
-        return heat.driver1?._id.toString() === heat.winner?._id.toString()
-            ? heat.driver2
-            : heat.driver1;
-        });
-    
+      return heat.driver1?._id.toString() === heat.winner?._id.toString()
+        ? heat.driver2
+        : heat.driver1;
+    });
+
     const top32HeatLosers = top32HeatList.map((heat) => {
-        return heat.driver1?._id.toString() === heat.winner?._id.toString()
-            ? heat.driver2
-            : heat.driver1;
-        });
-    
+      return heat.driver1?._id.toString() === heat.winner?._id.toString()
+        ? heat.driver2
+        : heat.driver1;
+    });
+
     if (finalHeatWinner) {
-        scoreBoard.push({ driver: finalHeatWinner, placement: 1 });
-        }
+      scoreBoard.push({ driver: finalHeatWinner, placement: 1 });
+    }
     if (finalHeatLoser) {
-        scoreBoard.push({ driver: finalHeatLoser, placement: 2 });
-        }
+      scoreBoard.push({ driver: finalHeatLoser, placement: 2 });
+    }
     if (thirdPlaceHeatWinner) {
-        scoreBoard.push({ driver: thirdPlaceHeatWinner, placement: 3 });
-        }
+      scoreBoard.push({ driver: thirdPlaceHeatWinner, placement: 3 });
+    }
     if (thirdPlaceHeatLoser) {
-        scoreBoard.push({ driver: thirdPlaceHeatLoser, placement: 4 });
-        }
+      scoreBoard.push({ driver: thirdPlaceHeatLoser, placement: 4 });
+    }
     if (top8HeatLosers) {
-        top8HeatLosers.forEach((driver, index) => {
-            scoreBoard.push({ driver, placement: 5 + index });
-            });
-        }
+      top8HeatLosers.forEach((driver, index) => {
+        scoreBoard.push({ driver, placement: 5 + index });
+      });
+    }
     if (top16HeatLosers) {
-        top16HeatLosers.forEach((driver, index) => {
-            scoreBoard.push({ driver, placement: 9 + index });
-            });
-        }
+      top16HeatLosers.forEach((driver, index) => {
+        scoreBoard.push({ driver, placement: 9 + index });
+      });
+    }
     if (top32HeatLosers) {
-        top32HeatLosers.forEach((driver, index) => {
-            scoreBoard.push({ driver, placement: 17 + index });
-            });
-        }
+      top32HeatLosers.forEach((driver, index) => {
+        scoreBoard.push({ driver, placement: 17 + index });
+      });
+    }
     return scoreBoard;
   }
 }

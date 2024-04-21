@@ -16,7 +16,7 @@ class DriverService {
       lastName,
       age,
       raceNumber,
-      cars
+      cars,
     });
     return await driver.save();
   }
@@ -36,7 +36,7 @@ class DriverService {
   }
 
   async addCarToDriver(
-    req: Request
+    req: Request,
   ): Promise<{ success?: IDriver; error?: string }> {
     const { driverId, model, engine, torque, hp, activeFrom, activeTo } =
       req.body;

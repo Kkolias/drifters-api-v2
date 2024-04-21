@@ -37,7 +37,7 @@ export class CreateCompetitionDayFromQualifyingResults {
   // basic methods
   private async createCompetitionDay(
     eventId: string,
-    resultList: IQualifyingComputedResultItem[]
+    resultList: IQualifyingComputedResultItem[],
   ): Promise<ICompetitionDayItem> {
     const heatList = this.generateHeatList(resultList);
     const competitionDay = await CompetitionDay.create({
@@ -56,7 +56,7 @@ export class CreateCompetitionDayFromQualifyingResults {
 
   // bracketNumber for heat will be generated later as it makes no fucking sense how its calculated :)
   private generateHeatList(
-    resultList: IQualifyingComputedResultItem[]
+    resultList: IQualifyingComputedResultItem[],
   ): IHeat[] {
     const heatList: IHeat[] = [];
     for (let i = 0; i < resultList.length / 2; i++) {
@@ -75,7 +75,12 @@ export class CreateCompetitionDayFromQualifyingResults {
   }
 
   // will be used in handleNewHeatOnJudging.ts
-  generateFirstRun(driver1: IDriver | null, driver2: IDriver | null, type?: RunType, runNumber?: number): Partial<IRunPairItem> {
+  generateFirstRun(
+    driver1: IDriver | null,
+    driver2: IDriver | null,
+    type?: RunType,
+    runNumber?: number,
+  ): Partial<IRunPairItem> {
     return {
       runNumber: runNumber ?? 1,
       type: type || RunType.normal,

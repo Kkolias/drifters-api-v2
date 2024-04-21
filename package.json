@@ -14,7 +14,8 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
     "start": "ts-node src/index.ts",
-    "docker:compose": "docker compose up -d"
+    "docker:compose": "docker compose up -d",
+    "prettier": "prettier --write ."
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -22,6 +23,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/mongoose": "^5.11.97",
     "nodemon": "^3.0.2",
+    "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }

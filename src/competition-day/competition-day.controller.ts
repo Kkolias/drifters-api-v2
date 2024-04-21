@@ -5,12 +5,11 @@ import { isAdmin } from "../user/utils/isAdmin";
 export class QualifyingController {
   async createCompetitionDay(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const output = await competitionDayService.handleCreateCompetitionDay(
-        req
-      );
+      const output =
+        await competitionDayService.handleCreateCompetitionDay(req);
 
       res.status(201).json(output);
     } catch (error) {
@@ -42,7 +41,7 @@ export class QualifyingController {
 
   async addHeatToCompetitionDay(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -61,12 +60,11 @@ export class QualifyingController {
 
   async addRunToHeat(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const { success, error } = await competitionDayService.handleAddRunToHeat(
-        req
-      );
+      const { success, error } =
+        await competitionDayService.handleAddRunToHeat(req);
 
       if (error) {
         res.status(400).json(error);
@@ -81,7 +79,7 @@ export class QualifyingController {
 
   async giveJudgePointsToRun(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -100,12 +98,12 @@ export class QualifyingController {
 
   async generateCompetitionDayFromResults(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
         await competitionDayService.handleGenerateCompetitionDayFromResultListForEvent(
-          req
+          req,
         );
 
       if (error) {
@@ -121,13 +119,11 @@ export class QualifyingController {
 
   async updateHeat(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
-        await competitionDayService.handleUpdateHeat(
-          req
-        );
+        await competitionDayService.handleUpdateHeat(req);
 
       if (error) {
         res.status(400).json(error);

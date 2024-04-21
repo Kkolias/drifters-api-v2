@@ -5,7 +5,7 @@ import { isAdmin } from "../user/utils/isAdmin";
 export class DriftEventController {
   async createDriftEvent(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const output = await driftEventService.handleCreateDriftEvent(req);
@@ -40,7 +40,7 @@ export class DriftEventController {
 
   async addQualifyingToDriftEvent(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -59,7 +59,7 @@ export class DriftEventController {
 
   async handleQualifyingScoring(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -78,7 +78,7 @@ export class DriftEventController {
 
   async handleCompetitionDayScoring(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =

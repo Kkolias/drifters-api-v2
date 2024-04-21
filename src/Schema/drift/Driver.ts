@@ -6,16 +6,16 @@ export interface ICar {
   torque: number;
   hp: number;
   activeFrom: Date;
-  activeTo: Date | null
+  activeTo: Date | null;
 }
 
 export interface IDriver extends Document {
   firstName: string;
   lastName: string;
-  age: number
+  age: number;
   raceNumber: number | null;
   createdAt: Date;
-  cars: ICar[]
+  cars: ICar[];
 }
 
 const DriverShcema = new Schema<IDriver>({
@@ -31,14 +31,11 @@ const DriverShcema = new Schema<IDriver>({
       torque: Number,
       hp: Number,
       activeFrom: { type: Date, default: null },
-      activeTo: { type: Date, default: null }
+      activeTo: { type: Date, default: null },
     },
   ],
 });
 
-const Driver = mongoose.model<IDriver>(
-  "Driver",
-  DriverShcema
-);
+const Driver = mongoose.model<IDriver>("Driver", DriverShcema);
 
 export default Driver;

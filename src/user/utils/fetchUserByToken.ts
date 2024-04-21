@@ -4,7 +4,7 @@ import User, { IUser } from "../../Schema/User";
 const JWT_SECRET = "apina";
 
 export async function fetchUserByToken(
-  token: string
+  token: string,
 ): Promise<{ user: IUser | null; error: string }> {
   let decoded: any;
   try {

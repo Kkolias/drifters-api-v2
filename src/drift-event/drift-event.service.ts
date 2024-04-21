@@ -43,7 +43,7 @@ export class DriftEventService {
   }
 
   async handleCreateDriftEvent(
-    req: Request
+    req: Request,
   ): Promise<IDriftEventSchema | null> {
     const { seasonId, name, country, city, track, startsAt, endsAt } = req.body;
 
@@ -64,7 +64,7 @@ export class DriftEventService {
 
   async addQualifyingToDriftEvent(
     qualifyingId: string,
-    driftEventId: string
+    driftEventId: string,
   ): Promise<IDriftEventSchema | null> {
     const [qualifying, driftEvent] = await Promise.all([
       qualifyingService.findById(qualifyingId),
@@ -80,13 +80,13 @@ export class DriftEventService {
   }
 
   async handleAddQualifyingToDriftEvent(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftEventSchema | null }> {
     const { qualifyingId, driftEventId } = req.body;
 
     const qualifying = await this.addQualifyingToDriftEvent(
       qualifyingId,
-      driftEventId
+      driftEventId,
     );
 
     if (!qualifying) return { error: "updating event failed", success: null };
@@ -94,7 +94,7 @@ export class DriftEventService {
   }
 
   async handleQualifyingScoring(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftEventSchema | null }> {
     const { eventId } = req.body;
 
@@ -108,7 +108,7 @@ export class DriftEventService {
   }
 
   async handleCompetitionDayScoring(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftEventSchema | null }> {
     const { eventId } = req.body;
 

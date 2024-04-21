@@ -3,26 +3,25 @@ import { IDriver } from "./Driver";
 import { IDriftEventSchema } from "./DriftEvent";
 
 export interface IQualifyingSchemaRun {
-  line: number | null
-  angle: number | null
-  style: number | null
+  line: number | null;
+  angle: number | null;
+  style: number | null;
 }
 
 export interface IQualifyingResultItem extends Document {
-  driver: IDriver
-  orderNumber: number
-  run1: IQualifyingSchemaRun | null
-  run2: IQualifyingSchemaRun | null
+  driver: IDriver;
+  orderNumber: number;
+  run1: IQualifyingSchemaRun | null;
+  run2: IQualifyingSchemaRun | null;
 }
 
 export interface IQualifyingSchemaItem extends Document {
-  eventId: string
-  event?: IDriftEventSchema | null
-  resultList: IQualifyingResultItem[]
-  date: Date | null
-  createdAt: Date
+  eventId: string;
+  event?: IDriftEventSchema | null;
+  resultList: IQualifyingResultItem[];
+  date: Date | null;
+  createdAt: Date;
 }
-
 
 const QualifyingSchema = new Schema<IQualifyingSchemaItem>({
   eventId: { type: String, required: true },
@@ -33,7 +32,7 @@ const QualifyingSchema = new Schema<IQualifyingSchemaItem>({
       driver: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        required: true
+        required: true,
       },
       orderNumber: { type: Number, required: true },
       run1: { type: Object, default: null },
@@ -44,7 +43,7 @@ const QualifyingSchema = new Schema<IQualifyingSchemaItem>({
 
 const Qualifying = mongoose.model<IQualifyingSchemaItem>(
   "Qualifying",
-  QualifyingSchema
+  QualifyingSchema,
 );
 
 export default Qualifying;

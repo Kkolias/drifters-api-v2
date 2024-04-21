@@ -33,14 +33,14 @@ const DriftSeasonSchema = new Schema<IDriftSeason>({
   ],
   leaderboard: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Leaderboard',
-    default: null
-  }
+    ref: "Leaderboard",
+    default: null,
+  },
 });
 
 const DriftSeason = mongoose.model<IDriftSeason>(
   "DriftSeason",
-  DriftSeasonSchema
+  DriftSeasonSchema,
 );
 
 export default DriftSeason;

@@ -21,7 +21,7 @@ import { IDriver } from "../../Schema/drift/Driver";
 export async function handleNewHeatOnJudging(
   competitionDayId: string,
   judgedHeatId: string,
-  runId: string
+  runId: string,
 ): Promise<any> {
   // find heat from competitionDay by id where heatList.heatId === judgedHeatId
   const competitionDay = await CompetitionDay.findById(competitionDayId)
@@ -32,7 +32,7 @@ export async function handleNewHeatOnJudging(
   if (!competitionDay) return;
 
   const judgetHeat = competitionDay?.heatList?.find(
-    (heat) => heat?._id?.toString() === judgedHeatId
+    (heat) => heat?._id?.toString() === judgedHeatId,
   );
   if (!judgetHeat) return;
 
@@ -63,7 +63,7 @@ function wasJudgetOneMoreTime(judgetHeat: IHeat, runId: string): boolean {
   // if alteast 2 judgePoints are 'omt'
   // or if all are different
   const omtCount = [run.judgePoint1, run.judgePoint2, run.judgePoint3]?.filter(
-    (i) => i === JudgePoint.omt
+    (i) => i === JudgePoint.omt,
   )?.length;
 
   const allDifferent =
@@ -74,7 +74,7 @@ function wasJudgetOneMoreTime(judgetHeat: IHeat, runId: string): boolean {
 }
 
 async function findById(
-  competitionDayId: string
+  competitionDayId: string,
 ): Promise<ICompetitionDayItem | null> {
   return await CompetitionDay.findById(competitionDayId)
     .lean()
@@ -85,7 +85,7 @@ async function findById(
 
 async function handleCreateNewHeat(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
   const newHeat = await generateHeat(competitionDayId, judgetHeat);
   if (!newHeat) return await findById(competitionDayId);
@@ -94,7 +94,7 @@ async function handleCreateNewHeat(
   return await CompetitionDay.findOneAndUpdate(
     { _id: competitionDayId },
     { $push: { heatList: newHeat } },
-    { new: true }
+    { new: true },
   );
 }
 
@@ -150,16 +150,16 @@ function bracketNumberToNextBracketNumber(bracketNumber: number): number {
 
 async function generateHeat(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<IHeat | null> {
   const newHeatType = heatTypeToNextHeatType(judgetHeat.heatType);
   const newBracketNumber = bracketNumberToNextBracketNumber(
-    judgetHeat.bracketNumber
+    judgetHeat.bracketNumber,
   );
 
   const isBracketAlreadyCreated = await isHeatForBracketNumberCreated(
     competitionDayId,
-    newBracketNumber
+    newBracketNumber,
   );
   if (isBracketAlreadyCreated) {
     return null;
@@ -216,7 +216,7 @@ function getNextBracketNumberForChaseDriver(judgetHeat: IHeat): number {
 
 async function handleAddWinnerToExistingHeat(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
   const driver2 = competitionDayComputedUtil.computeHeatWinnerId(judgetHeat);
   //   const drvier2 = await driverService.findById(winnerId)
@@ -235,7 +235,7 @@ async function handleAddWinnerToExistingHeat(
         "heatList.$.runList.0.run2.leadDriverId": driver2?._id,
       },
     },
-    { new: true }
+    { new: true },
   );
 
   //   const updatedHeat = await CompetitionDay.findOneAndUpdate(
@@ -249,7 +249,7 @@ async function handleAddWinnerToExistingHeat(
 
 async function handleJudgetTop4Heat(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ) {
   const heatNumber = judgetHeat.bracketNumber;
   if (heatNumber === 29) {
@@ -261,10 +261,10 @@ async function handleJudgetTop4Heat(
 
 async function handleCreateFinalAndBronze(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
   const winner = competitionDayComputedUtil.computeHeatWinnerId(
-    judgetHeat
+    judgetHeat,
   ) as IDriver;
   const loser = (
     judgetHeat.driver1?._id === winner?._id
@@ -275,12 +275,12 @@ async function handleCreateFinalAndBronze(
   const finalHeat = await generateHeatFinalOrBronze(
     competitionDayId,
     winner,
-    HeatType.final
+    HeatType.final,
   );
   const bronzeHeat = await generateHeatFinalOrBronze(
     competitionDayId,
     loser,
-    HeatType.bronze
+    HeatType.bronze,
   );
 
   const heatList = [finalHeat, bronzeHeat]?.filter((i) => i);
@@ -289,20 +289,20 @@ async function handleCreateFinalAndBronze(
   return await CompetitionDay.findOneAndUpdate(
     { _id: competitionDayId },
     { $push: { heatList } },
-    { new: true }
+    { new: true },
   );
 }
 
 async function generateHeatFinalOrBronze(
   competitionDayId: string,
   driver1: IDriver,
-  heatType: HeatType.final | HeatType.bronze
+  heatType: HeatType.final | HeatType.bronze,
 ): Promise<IHeat | null> {
   const newBracketNumber = heatType === HeatType.final ? 32 : 31;
 
   const isBracketAlreadyCreated = await isHeatForBracketNumberCreated(
     competitionDayId,
-    newBracketNumber
+    newBracketNumber,
   );
   if (isBracketAlreadyCreated) return null;
 
@@ -317,10 +317,10 @@ async function generateHeatFinalOrBronze(
 
 async function handleAddDriversToFinalAndBronze(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
   const winner = competitionDayComputedUtil.computeHeatWinnerId(
-    judgetHeat
+    judgetHeat,
   ) as IDriver;
   const loser = (
     judgetHeat.driver1?._id === winner?._id
@@ -338,7 +338,7 @@ async function handleAddDriversToFinalAndBronze(
           "heatList.$.runList.0.run2.leadDriverId": winner?._id,
         },
       },
-      { new: true }
+      { new: true },
     ),
     CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId, "heatList.bracketNumber": 31 },
@@ -349,7 +349,7 @@ async function handleAddDriversToFinalAndBronze(
           "heatList.$.runList.0.run2.leadDriverId": loser?._id,
         },
       },
-      { new: true }
+      { new: true },
     ),
   ]);
 
@@ -362,7 +362,7 @@ async function handleAddDriversToFinalAndBronze(
 
 async function isHeatForBracketNumberCreated(
   competitionDayId: string,
-  bracketNumber: number
+  bracketNumber: number,
 ): Promise<boolean> {
   // find heat from competitionDay by id where heatList has item with bracketNumber
   const found = await CompetitionDay.findOne({
@@ -375,19 +375,19 @@ async function isHeatForBracketNumberCreated(
 // section for creating new run to heat.runList for one more time
 async function handleAddOneMoreTimeRunToHeat(
   competitionDayId: string,
-  judgetHeat: IHeat
+  judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
   const runNumber = judgetHeat.runList.length + 1;
   const newRun = competitionDayUtil.generateFirstRun(
     judgetHeat.driver1,
     judgetHeat.driver2,
     RunType.omt,
-    runNumber
+    runNumber,
   );
   const updatedHeat = await CompetitionDay.findOneAndUpdate(
     { _id: competitionDayId, "heatList._id": judgetHeat._id },
     { $push: { "heatList.$.runList": newRun } },
-    { new: true }
+    { new: true },
   );
 
   return updatedHeat;

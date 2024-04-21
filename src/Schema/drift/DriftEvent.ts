@@ -12,7 +12,7 @@ export interface IDriftEventSchema extends Document {
   startsAt: Date;
   endsAt: Date;
   qualifying: IQualifyingSchemaItem;
-  competitionDay: ICompetitionDayItem
+  competitionDay: ICompetitionDayItem;
   createdAt: Date;
 }
 
@@ -21,25 +21,25 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   startsAt: { type: Date, default: null },
   endsAt: { type: Date, default: null },
   country: { type: String, required: true },
-  city: { type: String, default: '' },
+  city: { type: String, default: "" },
   track: { type: String, required: true },
   name: { type: String, required: true },
   seasonId: { type: String, required: true },
   qualifying: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Qualifying",
-    default: null
+    default: null,
   },
   competitionDay: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "CompetitionDay",
-    default: null
+    default: null,
   },
 });
 
 const DriftEvent = mongoose.model<IDriftEventSchema>(
   "DriftEvent",
-  DriftEventSchema
+  DriftEventSchema,
 );
 
 export default DriftEvent;

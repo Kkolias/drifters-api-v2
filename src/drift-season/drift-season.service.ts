@@ -21,7 +21,9 @@ export class DriftSeasonService {
   }
 
   async findById(id: string): Promise<IDriftSeason | null> {
-    return await DriftSeason.findById(id).populate("driftEvents").populate("leaderboard");
+    return await DriftSeason.findById(id)
+      .populate("driftEvents")
+      .populate("leaderboard");
   }
 
   async createDriftSeason({
@@ -47,7 +49,7 @@ export class DriftSeasonService {
 
   async addEventToDriftSeason(
     eventId: string,
-    seasonId: string
+    seasonId: string,
   ): Promise<IDriftSeason | null> {
     const [driftSeason, driftEvent] = await Promise.all([
       this.findById(seasonId),
@@ -63,7 +65,7 @@ export class DriftSeasonService {
   }
 
   async handleAddEventToDriftSeason(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftSeason | null }> {
     const { eventId, seasonId } = req.body;
 
@@ -75,7 +77,7 @@ export class DriftSeasonService {
 
   async addDriverToDriftSeason(
     driverId: string,
-    seasonId: string
+    seasonId: string,
   ): Promise<IDriftSeason | null> {
     const [driftSeason, driver] = await Promise.all([
       this.findById(seasonId),
@@ -91,7 +93,7 @@ export class DriftSeasonService {
   }
 
   async handleAddDriverToDriftSeason(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftSeason | null }> {
     const { driverId, seasonId } = req.body;
 
@@ -103,7 +105,7 @@ export class DriftSeasonService {
 
   async addManyDriversToDriftSeason(
     driverIdList: string[],
-    seasonId: string
+    seasonId: string,
   ): Promise<IDriftSeason | null> {
     const [driftSeason, drivers] = await Promise.all([
       this.findById(seasonId),
@@ -119,13 +121,13 @@ export class DriftSeasonService {
   }
 
   async handleAddManyDriversToDriftSeason(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftSeason | null }> {
     const { driverIdList, seasonId } = req.body;
 
     const driftEvent = await this.addManyDriversToDriftSeason(
       driverIdList,
-      seasonId
+      seasonId,
     );
 
     if (!driftEvent) return { error: "updating season failed", success: null };
@@ -134,7 +136,7 @@ export class DriftSeasonService {
 
   async addLeaderboardToDriftSeason(
     leaderboardId: string,
-    seasonId: string
+    seasonId: string,
   ): Promise<IDriftSeason | null> {
     const [driftSeason, leaderboard] = await Promise.all([
       this.findById(seasonId),
@@ -150,13 +152,13 @@ export class DriftSeasonService {
   }
 
   async handleAddLeaderboardToDriftSeason(
-    req: Request
+    req: Request,
   ): Promise<{ error: string; success: IDriftSeason | null }> {
     const { leaderboardId, seasonId } = req.body;
 
     const driftEvent = await this.addLeaderboardToDriftSeason(
       leaderboardId,
-      seasonId
+      seasonId,
     );
 
     if (!driftEvent) return { error: "updating season failed", success: null };

@@ -29,7 +29,7 @@ export interface IRunItem {
 }
 
 export interface IRunPairItem {
-  _id: string
+  _id: string;
   type: RunType;
   runNumber: number;
   run1: IRunItem;
@@ -64,7 +64,7 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
       driver1: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Driver",
-        default: null
+        default: null,
       },
       driver2: {
         type: mongoose.Schema.Types.ObjectId,
@@ -99,7 +99,7 @@ const CompetitionDaySchema = new Schema<ICompetitionDayItem>({
 
 const CompetitionDay = mongoose.model<ICompetitionDayItem>(
   "CompetitionDay",
-  CompetitionDaySchema
+  CompetitionDaySchema,
 );
 
 export default CompetitionDay;

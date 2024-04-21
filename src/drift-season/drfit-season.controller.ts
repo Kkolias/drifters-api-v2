@@ -5,7 +5,7 @@ import { isAdmin } from "../user/utils/isAdmin";
 export class DriftSeasonController {
   async createDriftSeason(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const output = await driftSeasonService.handleCreateDriftSeason(req);
@@ -40,7 +40,7 @@ export class DriftSeasonController {
 
   async addDriverToDriftSeason(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -59,7 +59,7 @@ export class DriftSeasonController {
 
   async addManyDriversToDriftSeason(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -78,7 +78,7 @@ export class DriftSeasonController {
 
   async addEventToDriftSeason(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =
@@ -97,7 +97,7 @@ export class DriftSeasonController {
 
   async addLeaderboardToDriftSeason(req: Request, res: Response) {
     try {
-      if(!isAdmin(req)) {
+      if (!isAdmin(req)) {
         return res.status(401).json({ error: "Unauthorized" });
       }
       const { success, error } =

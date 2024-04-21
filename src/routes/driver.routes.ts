@@ -1,12 +1,10 @@
-import express from 'express'
-import driverController from '../driver/driver.controller'
-const router = express.Router()
+import express from "express";
+import driverController from "../driver/driver.controller";
+const router = express.Router();
 
+router.get("/get-all", driverController.getAll);
+router.get("/get-by-id", driverController.getById);
+router.post("/create", driverController.createDriver);
+router.post("/add-car", driverController.addCarToDriver);
 
-router.get('/get-all', driverController.getAll)
-router.get('/get-by-id', driverController.getById)
-router.post('/create', driverController.createDriver)
-router.post('/add-car', driverController.addCarToDriver)
-
-
-export = router
+export = router;
