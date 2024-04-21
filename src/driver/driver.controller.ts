@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import driverService from "./driver.service";
+import { isAdmin } from "../user/utils/isAdmin";
 
 export class DriverController {
     async createDriver(req: Request, res: Response) {
         try {
+            if(!isAdmin(req)) {
+                return res.status(401).json({ error: "Unauthorized" });
+              }
             const savedPermit = await driverService.createDriver(req);
 
             res.status(201).json(savedPermit);
@@ -36,6 +40,9 @@ export class DriverController {
 
     async addCarToDriver(req: Request, res: Response) {
         try {
+            if(!isAdmin(req)) {
+                return res.status(401).json({ error: "Unauthorized" });
+              }
             const { success, error } =
                 await driverService.addCarToDriver(req);
 

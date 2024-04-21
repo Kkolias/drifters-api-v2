@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import competitionDayService from "./competition-day.service";
+import { isAdmin } from "../user/utils/isAdmin";
 
 export class QualifyingController {
   async createCompetitionDay(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const output = await competitionDayService.handleCreateCompetitionDay(
         req
       );
@@ -38,6 +42,9 @@ export class QualifyingController {
 
   async addHeatToCompetitionDay(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const { success, error } =
         await competitionDayService.handleAddHeatToCompetitionDay(req);
 
@@ -54,6 +61,9 @@ export class QualifyingController {
 
   async addRunToHeat(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const { success, error } = await competitionDayService.handleAddRunToHeat(
         req
       );
@@ -71,6 +81,9 @@ export class QualifyingController {
 
   async giveJudgePointsToRun(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const { success, error } =
         await competitionDayService.handleGiveJudgePointsToRun(req);
 
@@ -87,6 +100,9 @@ export class QualifyingController {
 
   async generateCompetitionDayFromResults(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const { success, error } =
         await competitionDayService.handleGenerateCompetitionDayFromResultListForEvent(
           req
@@ -105,6 +121,9 @@ export class QualifyingController {
 
   async updateHeat(req: Request, res: Response) {
     try {
+      if(!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const { success, error } =
         await competitionDayService.handleUpdateHeat(
           req

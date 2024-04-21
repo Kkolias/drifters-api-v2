@@ -1,3 +1,4 @@
+import { isAdmin } from "../user/utils/isAdmin";
 import leaderboardService from "./leaderboard.service";
 import { Request, Response } from "express";
 
@@ -6,6 +7,9 @@ import { Request, Response } from "express";
 export class LeaderboardController {
     async createLeaderboard(req: Request, res: Response) {
         try {
+          if(!isAdmin(req)) {
+            return res.status(401).json({ error: "Unauthorized" });
+          }
             const savedLeaderboard = await leaderboardService.createDriver(req);
 
             res.status(201).json(savedLeaderboard);
@@ -38,6 +42,9 @@ export class LeaderboardController {
 
     async addDriverToScoreboard(req: Request, res: Response) {
         try {
+          if(!isAdmin(req)) {
+            return res.status(401).json({ error: "Unauthorized" });
+          }
           const { success, error } =
             await leaderboardService.addDriverToScoreboard(req);
     
