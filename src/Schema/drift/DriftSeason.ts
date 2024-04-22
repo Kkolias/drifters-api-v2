@@ -7,6 +7,7 @@ import { IDriver } from "./Driver";
 export interface IDriftSeason extends Document {
   serie: DriftSerie;
   year: number;
+  name: string
   driftEvents: IDriftEventSchema[];
   driversOfSeason: IDriver[];
   leaderboard: ILeaderboard;
@@ -16,6 +17,7 @@ export interface IDriftSeason extends Document {
 const DriftSeasonSchema = new Schema<IDriftSeason>({
   serie: { type: String, required: true },
   year: { type: Number, required: true },
+  name: { type: String, default: ''},
   createdAt: { type: Date, default: () => Date.now() },
   driftEvents: [
     {
