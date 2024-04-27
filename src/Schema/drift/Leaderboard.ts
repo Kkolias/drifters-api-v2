@@ -3,6 +3,7 @@ import { IDriver } from "./Driver";
 
 export enum DriftSerie {
   dmec = "dmec",
+  fd = "fd",
 }
 
 export interface ScoreboardItem {
