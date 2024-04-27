@@ -4,7 +4,7 @@ import { isAdmin } from "../user/utils/isAdmin";
 
 class DriverService {
   async createDriver(req: Request): Promise<IDriver | null> {
-    const { firstName, lastName, age, raceNumber } = req.body;
+    const { firstName, lastName, birthday, raceNumber } = req.body;
     const cars = req.body?.cars || [];
 
     if (!(await isAdmin(req))) {
@@ -14,7 +14,7 @@ class DriverService {
     const driver = new Driver({
       firstName,
       lastName,
-      age,
+      birthday,
       raceNumber,
       cars,
     });
