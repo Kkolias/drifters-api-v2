@@ -5,6 +5,7 @@
 
 import DriftEvent from "../../Schema/drift/DriftEvent";
 import Leaderboard, { ILeaderboard } from "../../Schema/drift/Leaderboard";
+import driftSeasonService from "../../drift-season/drift-season.service";
 import qualifyingService from "../../qualifying/qualifying.service";
 
 // when giving score if driver is not in leaderboard we will add him to leaderboard and give points
@@ -17,10 +18,10 @@ import qualifyingService from "../../qualifying/qualifying.service";
 // item in scoreboard has driver and score, also numOfWins, numOfSeconds, numOfThirds but those are not used here
 
 async function getLeaderboardBySeasonId(
-  seasonId: string,
+  seasonId: string
 ): Promise<ILeaderboard> {
   return (await Leaderboard.findOne({ seasonId }).populate(
-    "scoreboard.driver",
+    "scoreboard.driver"
   )) as ILeaderboard;
 }
 
@@ -57,7 +58,7 @@ export async function handleQualifyingScoring({
     const score = getPointsForPosition(i + 1);
 
     const scoreboardItem = leaderboard.scoreboard.find(
-      (item) => item.driver._id.toString() === driver._id.toString(),
+      (item) => item.driver._id.toString() === driver._id.toString()
     );
 
     if (scoreboardItem) {
@@ -82,5 +83,13 @@ async function createNewLeaderboard(seasonId: string): Promise<ILeaderboard> {
     seasonId,
   });
 
-  return await newLeaderboard.save();
+  const savedLeaderboard = await newLeaderboard.save();
+
+  const driftSeason = await driftSeasonService.findById(seasonId);
+
+  if (!driftSeason || !savedLeaderboard) return savedLeaderboard;
+
+  driftSeason.leaderboard = savedLeaderboard;
+  driftSeason.save();
+  return savedLeaderboard;
 }

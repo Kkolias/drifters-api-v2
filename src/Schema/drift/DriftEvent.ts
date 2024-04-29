@@ -43,3 +43,4 @@ const DriftEvent = mongoose.model<IDriftEventSchema>(
 );
 
 export default DriftEvent;
+
