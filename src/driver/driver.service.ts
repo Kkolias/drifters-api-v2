@@ -21,9 +21,9 @@ class DriverService {
     return await driver.save();
   }
 
-  async findAll(req: Request): Promise<IDriver[]> {
-    const isUserAdmin = await isAdmin(req);
-    if (!isUserAdmin) return [];
+  async findAll(_req: Request): Promise<IDriver[]> {
+    // const isUserAdmin = await isAdmin(req);
+    // if (!isUserAdmin) return [];
     return await Driver.find();
   }
 
