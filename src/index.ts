@@ -9,13 +9,19 @@ import qualifyingRouter from "./routes/qualifying.routes";
 import driftEventRouter from "./routes/drift-event.routes";
 import driftSeasonRouter from "./routes/drift-season.routes";
 import competitionDayRouter from "./routes/competition-day.routes";
+import { getMongoUrl } from "./utils/getMongoUrl";
+require("dotenv").config();
 
 const app = express();
 const port = 8000;
 
 const cors = require("cors");
 
-const allowedOrigins = ["http://localhost:8000", "100.112.240.70"];
+const allowedOrigins = [
+  "http://localhost:8000",
+  "100.112.240.70",
+  "85.156.132.142",
+];
 const corsOptions = {
   origin: function (origin: string, callback: any) {
     if (!origin) {
@@ -42,9 +48,7 @@ app.use("/drift-season", driftSeasonRouter);
 app.use("/competition-day", competitionDayRouter);
 
 // MONGODB SETUP
-const mongoUrl =
-  "mongodb://admin:password@localhost:27018/?authMechanism=DEFAULT";
-// const mongoUrl = `mongodb://localhost:27017`; // dev
+const mongoUrl = getMongoUrl();
 mongoose.connect(mongoUrl, { dbName: "drifters-db" });
 
 app.get("/", cors(corsOptions), (req: Request, res: Response) => {
