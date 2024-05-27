@@ -21,6 +21,8 @@ const allowedOrigins = [
   "http://localhost:8000",
   "100.112.240.70",
   "85.156.132.142",
+  "https://driftdataan-prod-wi2i3y4dyq-lz.a.run.app",
+  "https://driftdataan-dev-wi2i3y4dyq-lz.a.run.app",
 ];
 const corsOptions = {
   origin: function (origin: string, callback: any) {
