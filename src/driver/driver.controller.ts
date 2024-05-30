@@ -38,6 +38,17 @@ export class DriverController {
     }
   }
 
+  async getByName(req: Request, res: Response) {
+    try {
+      const id = req?.query?.name?.toString() || "";
+      const driver = await driverService.findByName(id);
+      res.status(200).json(driver);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to retrieve driver" });
+    }
+  }
+
   async addCarToDriver(req: Request, res: Response) {
     try {
       if (!isAdmin(req)) {
