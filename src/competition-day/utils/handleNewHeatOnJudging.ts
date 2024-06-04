@@ -16,6 +16,8 @@ import CompetitionDay, {
 import competitionDayUtil from "./createCompetitionDayFromQualifyingResults";
 import competitionDayComputedUtil from "../computed/competition-day.computed";
 import { IDriver } from "../../Schema/drift/Driver";
+import { IShowdownHeat } from "../../Schema/drift/QualifyingShowdown";
+import { getHeatWinner } from "../../utils/drift/getHeatWinner";
 // import driverService from "../../driver/driver.service";
 
 export async function handleNewHeatOnJudging(
@@ -56,7 +58,7 @@ export async function handleNewHeatOnJudging(
   }
 }
 
-function wasJudgetOneMoreTime(judgetHeat: IHeat, runId: string): boolean {
+export function wasJudgetOneMoreTime(judgetHeat: IHeat | IShowdownHeat, runId: string): boolean {
   const run = judgetHeat.runList.find((run) => run?._id?.toString() === runId);
   if (!run) return false;
 
@@ -165,7 +167,7 @@ async function generateHeat(
     return null;
   }
 
-  const driver1 = competitionDayComputedUtil.computeHeatWinnerId(judgetHeat);
+  const driver1 = getHeatWinner(judgetHeat);
   const driver2 = null;
 
   return {
@@ -218,7 +220,7 @@ async function handleAddWinnerToExistingHeat(
   competitionDayId: string,
   judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
-  const driver2 = competitionDayComputedUtil.computeHeatWinnerId(judgetHeat);
+  const driver2 = getHeatWinner(judgetHeat);
   //   const drvier2 = await driverService.findById(winnerId)
 
   const nextBracketNumber = getNextBracketNumberForChaseDriver(judgetHeat);
@@ -263,7 +265,7 @@ async function handleCreateFinalAndBronze(
   competitionDayId: string,
   judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
-  const winner = competitionDayComputedUtil.computeHeatWinnerId(
+  const winner = getHeatWinner(
     judgetHeat,
   ) as IDriver;
   const loser = (
@@ -319,7 +321,7 @@ async function handleAddDriversToFinalAndBronze(
   competitionDayId: string,
   judgetHeat: IHeat,
 ): Promise<ICompetitionDayItem | null> {
-  const winner = competitionDayComputedUtil.computeHeatWinnerId(
+  const winner = getHeatWinner(
     judgetHeat,
   ) as IDriver;
   const loser = (

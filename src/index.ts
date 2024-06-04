@@ -9,6 +9,7 @@ import qualifyingRouter from "./routes/qualifying.routes";
 import driftEventRouter from "./routes/drift-event.routes";
 import driftSeasonRouter from "./routes/drift-season.routes";
 import competitionDayRouter from "./routes/competition-day.routes";
+import qualifyingShowdownRouter from "./routes/qualifying-showdown.routes";
 import { getMongoUrl } from "./utils/getMongoUrl";
 require("dotenv").config();
 
@@ -49,6 +50,7 @@ app.use("/qualifying", qualifyingRouter);
 app.use("/drift-event", driftEventRouter);
 app.use("/drift-season", driftSeasonRouter);
 app.use("/competition-day", competitionDayRouter);
+app.use("/qualifying-showdown", qualifyingShowdownRouter);
 
 // MONGODB SETUP
 const mongoUrl = getMongoUrl();

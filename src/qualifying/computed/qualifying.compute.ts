@@ -93,6 +93,7 @@ export class QualifyingComputedUtil {
     } as IQualifyingComputedItem;
   }
 
+  // TODO: Oma utili
   private handleSortTieBreaker(
     resultA: IQualifyingComputedResultItem,
     resultB: IQualifyingComputedResultItem,

@@ -81,7 +81,6 @@ class QualifyingService {
     qualifyingId: string,
     driverId: string,
   ): Promise<IQualifyingSchemaItem> {
-    console.log("ADADADASDA");
     const driver = (await driverService.findById(
       driverId,
     )) as unknown as IDriver;
@@ -90,7 +89,6 @@ class QualifyingService {
       run1: null,
       run2: null,
     };
-    console.log({ resultItem });
 
     const qualifying = await Qualifying.findByIdAndUpdate(
       qualifyingId,
@@ -120,8 +118,6 @@ class QualifyingService {
         run2: null,
       };
     });
-
-    // console.log(resultItemList);
 
     const qualifying = await Qualifying.findByIdAndUpdate(
       qualifyingId,

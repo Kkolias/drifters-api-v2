@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { IQualifyingSchemaItem } from "./Qualifying";
 import { ICompetitionDayItem } from "./CompetitionDay";
+import { IQualifyingShowdownItem } from "./QualifyingShowdown";
 
 // TODO: tästä computed outout versio missä laskettu voittajia yms statstiikkaa
 export interface IDriftEventSchema extends Document {
@@ -12,6 +13,7 @@ export interface IDriftEventSchema extends Document {
   startsAt: Date;
   endsAt: Date;
   qualifying: IQualifyingSchemaItem;
+  qualifyingShowdown: IQualifyingShowdownItem;
   competitionDay: ICompetitionDayItem;
   createdAt: Date;
 }
@@ -22,12 +24,17 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   endsAt: { type: Date, default: null },
   country: { type: String, required: true },
   city: { type: String, default: "" },
-  track: { type: String, required: true },
+  track: { type: String, default: "" },
   name: { type: String, required: true },
   seasonId: { type: String, required: true },
   qualifying: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Qualifying",
+    default: null,
+  },
+  qualifyingShowdown: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "QualifyingShowdown",
     default: null,
   },
   competitionDay: {

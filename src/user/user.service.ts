@@ -57,7 +57,6 @@ export class UserService {
     password: string;
   }): Promise<{ error: string; success: string }> {
     const user = await User.findOne({ email });
-    console.log("TÄÄLÄ", user);
 
     if (!user) return { error: "no user found", success: "" };
 
@@ -83,7 +82,6 @@ export class UserService {
     const { role, id } = req.body;
 
     const user = await User.findOne({ _id: id });
-    console.log("USER", user);
 
     if (!user) return { user: null, error: "no user found" };
 

@@ -18,6 +18,7 @@ export class DriftEventService {
     return await DriftEvent.findById(id)
       .populate("qualifying")
       .populate("competitionDay")
+      .populate("qualifyingShowdown")
       .exec();
   }
 
