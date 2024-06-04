@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get("/get-all", driftEventController.getAll);
 router.get("/get-by-id", driftEventController.getById);
+router.get("/get-by-slug", driftEventController.getBySlug);
 router.post("/create-drift-event", driftEventController.createDriftEvent);
 router.post(
   "/add-qualifying-to-drift-event",

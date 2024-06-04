@@ -38,6 +38,17 @@ export class DriftEventController {
     }
   }
 
+  async getBySlug(req: Request, res: Response) {
+    try {
+      const slug = req?.query?.slug?.toString() || "";
+      const qualifying = await driftEventService.findBySlug(slug);
+      res.status(200).json(qualifying);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to retrieve drift event" });
+    }
+  }
+
   async addQualifyingToDriftEvent(req: Request, res: Response) {
     try {
       if (!isAdmin(req)) {

@@ -10,6 +10,7 @@ export interface IDriftEventSchema extends Document {
   city: string;
   track: string;
   name: string;
+  slug: string;
   startsAt: Date;
   endsAt: Date;
   qualifying: IQualifyingSchemaItem;
@@ -26,6 +27,7 @@ const DriftEventSchema = new Schema<IDriftEventSchema>({
   city: { type: String, default: "" },
   track: { type: String, default: "" },
   name: { type: String, required: true },
+  slug: { type: String, default: "" }, // TODO: make unique
   seasonId: { type: String, required: true },
   qualifying: {
     type: mongoose.Schema.Types.ObjectId,
