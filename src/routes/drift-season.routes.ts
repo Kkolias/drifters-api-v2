@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get("/get-all", driftSeasonController.getAll);
 router.get("/get-by-id", driftSeasonController.getById);
+router.get("/get-by-slug", driftSeasonController.getBySlug);
 router.post("/create-drift-season", driftSeasonController.createDriftSeason);
 router.post(
   "/add-driver-to-season",

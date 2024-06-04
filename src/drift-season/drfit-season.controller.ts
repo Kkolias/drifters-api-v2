@@ -37,6 +37,17 @@ export class DriftSeasonController {
     }
   }
 
+  async getBySlug(req: Request, res: Response) {
+    try {
+      const slug = req?.query?.slug?.toString() || "";
+      const qualifying = await driftSeasonService.findBySlug(slug);
+      res.status(200).json(qualifying);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to retrieve drift season" });
+    }
+  }
+
   async getById(req: Request, res: Response) {
     try {
       const id = req?.query?.id?.toString() || "";

@@ -8,6 +8,7 @@ export interface IDriftSeason extends Document {
   serie: DriftSerie;
   year: number;
   name: string
+  slug: string
   driftEvents: IDriftEventSchema[];
   driversOfSeason: IDriver[];
   leaderboard: ILeaderboard;
@@ -18,6 +19,7 @@ const DriftSeasonSchema = new Schema<IDriftSeason>({
   serie: { type: String, required: true },
   year: { type: Number, required: true },
   name: { type: String, default: ''},
+  slug: { type: String, default: ''}, // TODO: make unique
   createdAt: { type: Date, default: () => Date.now() },
   driftEvents: [
     {

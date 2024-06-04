@@ -30,27 +30,35 @@ export class DriftSeasonService {
       .populate("leaderboard");
   }
 
+  async findBySlug(slug: string): Promise<IDriftSeason | null> {
+    return await DriftSeason.findOne({ slug })
+      .populate("driftEvents")
+      .populate("leaderboard");
+  }
+
   async createDriftSeason({
     serie,
     name,
     year,
+    slug
   }: {
     serie: DriftSerie;
     name: string;
     year: number;
+    slug: string;
   }): Promise<IDriftSeason> {
-    const driftSeason = await DriftSeason.create({ serie, year, name });
+    const driftSeason = await DriftSeason.create({ serie, year, name, slug });
     return driftSeason;
   }
 
   async handleCreateDriftSeason(req: Request): Promise<IDriftSeason | null> {
-    const { year, serie, name } = req.body;
+    const { year, serie, name, slug } = req.body;
 
     if (!(await isAdmin(req))) {
       return null;
     }
 
-    return await this.createDriftSeason({ serie, name, year });
+    return await this.createDriftSeason({ serie, name, year, slug });
   }
 
   async addEventToDriftSeason(
