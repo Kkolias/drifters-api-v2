@@ -60,28 +60,11 @@ class DriverService {
     return await Driver.findById(id);
   }
 
-  async findByName(name: string): Promise<IDriver | null> {
+  async findByName(slug: string): Promise<IDriver | null> {
     // name should be in format "firstname-lastname" or "many-firstnames-or-lastnames"
     try {
       // Split the name into first name and last name based on the last hyphen
-      const nameParts = name.split("-");
-
-      // Generate all possible combinations of first and last names
-      const combinations = [];
-      for (let i = 1; i < nameParts.length; i++) {
-        const firstName = nameParts.slice(0, i).join(" ").replace(/-/g, " ");
-        const lastName = nameParts.slice(i).join(" ").replace(/-/g, " ");
-
-        combinations.push({
-          firstName: new RegExp("^" + firstName + "$", "i"),
-          lastName: new RegExp("^" + lastName + "$", "i"),
-        });
-      }
-
-      // Query the database with the combinations using $or
-      const driver = await Driver.findOne({
-        $or: combinations,
-      });
+      const driver = await Driver.findOne({ slug })
 
       return driver;
     } catch (error) {
