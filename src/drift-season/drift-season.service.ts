@@ -39,7 +39,6 @@ export class DriftSeasonService {
 
   async findAllByDriverId(driverId: string): Promise<IDriftSeason[]> {
     const ObjectId = mongoose.Types.ObjectId;
-    console.log("driverId", driverId)
     if(!driverId) return [];
     // find seasons where season.leaderboard list has leaderboardItem.driver with driverId
     const driftSeasons = await DriftSeason.find()
