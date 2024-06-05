@@ -12,6 +12,7 @@ export interface ICar {
 export interface IDriver extends Document {
   firstName: string;
   lastName: string;
+  slug: string
   birthday: Date | null;
   raceNumber: number | null;
   createdAt: Date;
@@ -22,9 +23,10 @@ export interface IDriver extends Document {
 const DriverShcema = new Schema<IDriver>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
+  slug: { type: String, default: "" },
   birthday: { type: Date, default: null },
   raceNumber: { type: Number, default: null },
-  nationality: { type: String, required: true },
+  nationality: { type: String, default: "" },
   createdAt: { type: Date, default: () => Date.now() },
   cars: [
     {

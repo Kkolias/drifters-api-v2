@@ -1,11 +1,14 @@
 import Driver, { IDriver } from "../Schema/drift/Driver";
 import { Request } from "express";
 import { isAdmin } from "../user/utils/isAdmin";
+import { generateDriverNameSlug } from "../utils/generateDriverNameSlug";
 
 class DriverService {
   async createDriver(req: Request): Promise<IDriver | null> {
     const { firstName, lastName, birthday, raceNumber, nationality } = req.body;
     const cars = req.body?.cars || [];
+
+    const slug = generateDriverNameSlug(firstName, lastName);
 
     if (!(await isAdmin(req))) {
       return null;
@@ -15,11 +18,36 @@ class DriverService {
       firstName,
       lastName,
       birthday,
+      slug,
       raceNumber,
       cars,
       nationality,
     });
     return await driver.save();
+  }
+
+  async generateSlugForDrivers(req: Request): Promise<boolean> {
+    if (!(await isAdmin(req))) return false;
+    try {
+      // find drivers where slug is empty or not set at all
+      const drivers = await Driver.find({ slug: { $exists: false } });
+
+      // generate slug for each driver
+      // use firstname-lastname format (if name has - dont replace it: "Mika Keski-Korpi" -> "mika-keski-korpi")
+
+      for (let driver of drivers) {
+        const slug = generateDriverNameSlug(driver.firstName, driver.lastName)
+        driver.slug = slug;
+        console.log(driver)
+        console.log("-------------------")
+        await driver.save();
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error generating slug for drivers:", error);
+      return false;
+    }
   }
 
   async findAll(_req: Request): Promise<IDriver[]> {

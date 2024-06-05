@@ -17,6 +17,20 @@ export class DriverController {
     }
   }
 
+  async generateSlugForDrivers(req: Request, res: Response) {
+    try {
+      if (!isAdmin(req)) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const success = await driverService.generateSlugForDrivers(req);
+
+      res.status(201).json(success);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to update driver" });
+    }
+  }
+
   async getAll(req: Request, res: Response) {
     try {
       const drivers = await driverService.findAll(req);

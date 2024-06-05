@@ -7,5 +7,6 @@ router.get("/get-by-id", driverController.getById);
 router.get("/get-by-name", driverController.getByName);
 router.post("/create", driverController.createDriver);
 router.post("/add-car", driverController.addCarToDriver);
+router.post("/generate-slugs", driverController.generateSlugForDrivers);
 
 export = router;
