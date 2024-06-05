@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { IDriftSeason } from "./DriftSeason";
 
 export interface ICar {
   model: string;

@@ -23,5 +23,6 @@ router.post(
   driftSeasonController.addEventToDriftSeason
 );
 router.get("/find-all-light", driftSeasonController.findAllLight);
+router.get("/find-all-by-driver-id", driftSeasonController.findAllByDriverId);
 
 export = router;

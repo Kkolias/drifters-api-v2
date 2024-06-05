@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import DriftSeason, { IDriftSeason } from "../Schema/drift/DriftSeason";
 import { DriftSerie } from "../Schema/drift/Leaderboard";
 import driftEventService from "../drift-event/drift-event.service";
@@ -34,6 +35,29 @@ export class DriftSeasonService {
     return await DriftSeason.findOne({ slug })
       .populate("driftEvents")
       .populate("leaderboard");
+  }
+
+  async findAllByDriverId(driverId: string): Promise<IDriftSeason[]> {
+    const ObjectId = mongoose.Types.ObjectId;
+    console.log("driverId", driverId)
+    if(!driverId) return [];
+    // find seasons where season.leaderboard list has leaderboardItem.driver with driverId
+    const driftSeasons = await DriftSeason.find()
+    .populate({
+      path: 'leaderboard',
+      populate: {
+        path: 'scoreboard.driver',
+        // match: { _id: new ObjectId(driverId) }
+      }
+    })
+    .exec();
+
+    const filteredDriftSeasons = driftSeasons.filter(season => 
+      season.leaderboard && season.leaderboard.scoreboard.some(scoreboardEntry => 
+        scoreboardEntry.driver && scoreboardEntry.driver._id.equals(new ObjectId(driverId))
+      )
+    );
+    return filteredDriftSeasons;
   }
 
   async createDriftSeason({

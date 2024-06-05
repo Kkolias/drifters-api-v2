@@ -27,6 +27,17 @@ export class DriftSeasonController {
     }
   }
 
+  async findAllByDriverId(req: Request, res: Response) {
+    try {
+      const id = req?.query?.id?.toString() || "";
+      const qualifyings = await driftSeasonService.findAllByDriverId(id);
+      res.status(200).json(qualifyings);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to retrieve drift seasons" });
+    }
+  }
+
   async findAllLight(_req: Request, res: Response) {
     try {
       const qualifyings = await driftSeasonService.findAllLight();

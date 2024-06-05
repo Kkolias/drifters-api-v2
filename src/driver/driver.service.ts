@@ -2,6 +2,8 @@ import Driver, { IDriver } from "../Schema/drift/Driver";
 import { Request } from "express";
 import { isAdmin } from "../user/utils/isAdmin";
 import { generateDriverNameSlug } from "../utils/generateDriverNameSlug";
+import { IDriftSeason } from "../Schema/drift/DriftSeason";
+import driftSeasonService from "../drift-season/drift-season.service";
 
 class DriverService {
   async createDriver(req: Request): Promise<IDriver | null> {
@@ -36,10 +38,10 @@ class DriverService {
       // use firstname-lastname format (if name has - dont replace it: "Mika Keski-Korpi" -> "mika-keski-korpi")
 
       for (let driver of drivers) {
-        const slug = generateDriverNameSlug(driver.firstName, driver.lastName)
+        const slug = generateDriverNameSlug(driver.firstName, driver.lastName);
         driver.slug = slug;
-        console.log(driver)
-        console.log("-------------------")
+        console.log(driver);
+        console.log("-------------------");
         await driver.save();
       }
 
@@ -58,6 +60,11 @@ class DriverService {
 
   async findById(id: string): Promise<IDriver | null> {
     return await Driver.findById(id);
+  }
+
+  async findDriverSeasons(id: string): Promise<IDriftSeason[]> {
+    const seasons = await driftSeasonService.findAllByDriverId(id);
+    return seasons;
   }
 
   async findByName(slug: string): Promise<IDriver | null> {
