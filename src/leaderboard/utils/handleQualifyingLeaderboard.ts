@@ -4,9 +4,10 @@
 // we will also need to find the leaderboard by seasonId
 
 import DriftEvent from "../../Schema/drift/DriftEvent";
-import Leaderboard, { ILeaderboard } from "../../Schema/drift/Leaderboard";
+import Leaderboard, { DriftSerie, ILeaderboard } from "../../Schema/drift/Leaderboard";
 import driftSeasonService from "../../drift-season/drift-season.service";
 import qualifyingService from "../../qualifying/qualifying.service";
+import { getQualifyingPositionPointBySerie } from "../../utils/drift/getQualifyingPositionPointBySerie";
 
 // when giving score if driver is not in leaderboard we will add him to leaderboard and give points
 // this because events can have wildcard drivers that are not in leaderboard yet
@@ -29,10 +30,11 @@ async function getQualifyingByEventId(eventId: string) {
   return await qualifyingService.findByEventIdComputed(eventId);
 }
 
-function getPointsForPosition(position: number) {
-  if (position > 8) return 0;
-  return 9 - position;
+async function getDriftSerieOfSeason(seasonId: string): Promise<DriftSerie | null> {
+  const season = await driftSeasonService.findById(seasonId);
+  return season?.serie || null;
 }
+
 
 export async function handleQualifyingScoring({
   eventId,
@@ -41,8 +43,10 @@ export async function handleQualifyingScoring({
 }) {
   const event = await DriftEvent.findById(eventId);
   const seasonId = event?.seasonId;
-
+  
   if (!seasonId) return;
+  const driftSerie = await getDriftSerieOfSeason(seasonId);
+
   const qualifying = await getQualifyingByEventId(eventId);
   if (!qualifying) return;
 
@@ -55,7 +59,7 @@ export async function handleQualifyingScoring({
   for (let i = 0; i < qualifying.resultList.length; i++) {
     const result = qualifying.resultList[i];
     const driver = result.driver;
-    const score = getPointsForPosition(i + 1);
+    const score = getQualifyingPositionPointBySerie(driftSerie, i + 1);
 
     const scoreboardItem = leaderboard.scoreboard.find(
       (item) => item.driver._id.toString() === driver._id.toString()

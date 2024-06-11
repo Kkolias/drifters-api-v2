@@ -4,41 +4,41 @@
 
 import DriftEvent from "../../Schema/drift/DriftEvent";
 import { IDriver } from "../../Schema/drift/Driver";
-import Leaderboard, { ILeaderboard } from "../../Schema/drift/Leaderboard";
+import Leaderboard, {
+  DriftSerie,
+  ILeaderboard,
+} from "../../Schema/drift/Leaderboard";
 import competitionDayService from "../../competition-day/competition-day.service";
 import {
   ICompetitionDayComputed,
   IScoreBoardItem,
 } from "../../competition-day/computed/competition-day.computed";
+import driftSeasonService from "../../drift-season/drift-season.service";
+import { getBattlesPositionPointBySerie } from "../../utils/drift/getBattlesPositionPointBySerie";
 
 async function getLeaderboardBySeasonId(
-  seasonId: string,
+  seasonId: string
 ): Promise<ILeaderboard> {
   return (await Leaderboard.findOne({ seasonId }).populate(
-    "scoreboard.driver",
+    "scoreboard.driver"
   )) as ILeaderboard;
 }
 
 async function getCompetitionDayByEventId(
-  eventId: string,
+  eventId: string
 ): Promise<ICompetitionDayComputed> {
   return (await competitionDayService.findByEventId(
-    eventId,
+    eventId
   )) as ICompetitionDayComputed;
 }
 
-function getPointsForPosition(result: IScoreBoardItem) {
+function getPointsForPosition(
+  driftSerie: DriftSerie | null,
+  result: IScoreBoardItem
+) {
   // 1st +100, 2nd +88, 3rd 76, 4th 64, 5th-8th 48, 9th-16th 32, 17th-32nd 16 other 0
   const position = result?.placement;
-  if (!position) return 0;
-  if (position === 1) return 100;
-  if (position === 2) return 88;
-  if (position === 3) return 76;
-  if (position === 4) return 64;
-  if (position >= 5 && position <= 8) return 48;
-  if (position >= 9 && position <= 16) return 32;
-  if (position >= 17 && position <= 32) return 16;
-  return 0;
+  return getBattlesPositionPointBySerie(driftSerie, position);
 }
 
 function isWinner(result: IScoreBoardItem) {
@@ -53,6 +53,13 @@ function isThird(result: IScoreBoardItem) {
   return result?.placement === 3;
 }
 
+async function getDriftSerieOfSeason(
+  seasonId: string
+): Promise<DriftSerie | null> {
+  const season = await driftSeasonService.findById(seasonId);
+  return season?.serie || null;
+}
+
 export async function handleCompetitionDayScoring({
   eventId,
 }: {
@@ -62,6 +69,8 @@ export async function handleCompetitionDayScoring({
   const seasonId = event?.seasonId;
 
   if (!seasonId) return;
+  const driftSerie = await getDriftSerieOfSeason(seasonId);
+
   const competitionDay = await getCompetitionDayByEventId(eventId);
   if (!competitionDay) return;
 
@@ -76,10 +85,10 @@ export async function handleCompetitionDayScoring({
   for (let i = 0; i < battlesScoreboard.length; i++) {
     const result = battlesScoreboard[i];
     const driver = result.driver as IDriver;
-    const score = getPointsForPosition(result);
+    const score = getPointsForPosition(driftSerie, result);
 
     const scoreboardItem = leaderboard.scoreboard.find(
-      (item) => item.driver._id.toString() === driver?._id.toString(),
+      (item) => item.driver._id.toString() === driver?._id.toString()
     );
 
     if (scoreboardItem) {
