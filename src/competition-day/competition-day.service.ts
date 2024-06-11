@@ -260,11 +260,11 @@ export class CompetitionDayService {
     driver2Id: string;
   }): Promise<ICompetitionDayItem | null> {
     const [driver1, driver2] = await Promise.all([
-      driverService.findById(driver1Id),
-      driverService.findById(driver2Id),
+      driver1Id ? driverService.findById(driver1Id): null,
+      driver2Id ? driverService.findById(driver2Id): null,
     ]);
 
-    if (!driver1 || !driver2) return null;
+    // if (!driver1 || !driver2) return null;
 
     // const updatedHeat = {
     //   bracketNumber,

@@ -9,9 +9,9 @@ export function getHeatWinner(heat: IHeat | IShowdownHeat): IDriver | null {
     const driver2 = heat?.driver2;
 
     for (const run of runList) {
-      if (!driver1 || !driver2) {
-        return null;
-      }
+      // if (!driver1 || !driver2) {
+      //   return null;
+      // }
       const winner = getWinnerIdOfRun(run, driver1, driver2);
 
       if (winner) {
@@ -26,8 +26,8 @@ export function getHeatWinner(heat: IHeat | IShowdownHeat): IDriver | null {
 
   function getWinnerIdOfRun(
     run: IRunPairItem,
-    driver1: IDriver,
-    driver2: IDriver,
+    driver1: IDriver | null,
+    driver2: IDriver | null,
   ): IDriver | null {
     const driver1Count = [
       run.judgePoint1,
