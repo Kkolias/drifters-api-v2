@@ -52,7 +52,7 @@ export class CompetitionDayService {
 
   async createCompetitionDay(
     eventId: string,
-    date: Date,
+    date: Date
   ): Promise<ICompetitionDayItem> {
     const competitionDay = await CompetitionDay.create({
       eventId,
@@ -71,7 +71,7 @@ export class CompetitionDayService {
   }
 
   async handleCreateCompetitionDay(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const { eventId, date } = req.body;
     const competitionDay = await this.createCompetitionDay(eventId, date);
@@ -86,7 +86,7 @@ export class CompetitionDayService {
     driver2Id: string,
     heatType: string,
     bracketNumber: number,
-    competitionDayId: string,
+    competitionDayId: string
   ): Promise<{ success: ICompetitionDayItem | null; error?: string }> {
     const [driver1, driver2] = await Promise.all([
       driverService.findById(driver1Id),
@@ -107,14 +107,14 @@ export class CompetitionDayService {
     const competitionDay = await CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId },
       { $push: { heatList: newHeat } },
-      { new: true },
+      { new: true }
     );
 
     return { success: competitionDay };
   }
 
   async handleAddHeatToCompetitionDay(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const { driver1Id, driver2Id, heatType, bracketNumber, competitionDayId } =
       req.body;
@@ -123,18 +123,18 @@ export class CompetitionDayService {
       driver2Id,
       heatType,
       bracketNumber,
-      competitionDayId,
+      competitionDayId
     );
   }
 
   async addRunToHeat(
     competitionDayId: string,
     heatId: string,
-    newRun: Partial<IRunPairItem>,
+    newRun: Partial<IRunPairItem>
   ): Promise<ICompetitionDayItem> {
     const heat = await CompetitionDay.findOne(
       { _id: competitionDayId, "heatList._id": heatId },
-      { "heatList.$": 1 },
+      { "heatList.$": 1 }
     );
 
     if (!heat) {
@@ -153,20 +153,20 @@ export class CompetitionDayService {
           },
         },
       },
-      { new: true },
+      { new: true }
     );
 
     return competitionDay as ICompetitionDayItem;
   }
 
   async handleAddRunToHeat(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const { competitionDayId, heatId, newRun } = req.body;
     const competitionDay = await this.addRunToHeat(
       competitionDayId,
       heatId,
-      newRun,
+      newRun
     );
 
     if (!competitionDay)
@@ -187,7 +187,7 @@ export class CompetitionDayService {
       judgePoint1: JudgePoint;
       judgePoint2: JudgePoint;
       judgePoint3: JudgePoint;
-    },
+    }
   ): Promise<ICompetitionDayItem | null> {
     const competitionDay = await CompetitionDay.findOneAndUpdate(
       { _id: competitionDayId, "heatList.runList._id": runId },
@@ -201,7 +201,7 @@ export class CompetitionDayService {
       {
         new: true,
         arrayFilters: [{ "outer._id": heatId }, { "inner._id": runId }],
-      },
+      }
     );
     if (!competitionDay) return null;
 
@@ -209,14 +209,14 @@ export class CompetitionDayService {
   }
 
   async handleGiveJudgePointsToRun(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const { competitionDayId, heatId, runId, judgePoints } = req.body;
     const competitionDay = await this.giveJudgePointsToRun(
       competitionDayId,
       heatId,
       runId,
-      judgePoints,
+      judgePoints
     );
 
     if (!competitionDay)
@@ -226,13 +226,13 @@ export class CompetitionDayService {
   }
 
   async generateCompetitionDayFromResultListForEvent(
-    eventId: string,
+    eventId: string
   ): Promise<ICompetitionDayItem> {
     return await util.execute(eventId);
   }
 
   async handleGenerateCompetitionDayFromResultListForEvent(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const { eventId } = req.body;
     const created =
@@ -242,6 +242,40 @@ export class CompetitionDayService {
       return { error: "Error creating competition day", success: null };
 
     return { success: created };
+  }
+
+  async createNewHeat({
+    competitionDayId,
+    bracketNumber,
+    heatType,
+    driver1Id,
+    driver2Id,
+  }: {
+    competitionDayId: string;
+    bracketNumber: number;
+    heatType: HeatType;
+    driver1Id: string;
+    driver2Id: string;
+  }): Promise<ICompetitionDayItem | null> {
+    // generateFirstRun
+    const [driver1, driver2] = await Promise.all([
+      driver1Id ? driverService.findById(driver1Id) : null,
+      driver2Id ? driverService.findById(driver2Id) : null,
+    ]);
+
+    const newHeat = {
+      driver1, // this is lead driver
+      driver2, // this is chase driver
+      heatType,
+      bracketNumber,
+      runList: [util.generateFirstRun(driver1, driver2)],
+    };
+
+    return await CompetitionDay.findOneAndUpdate(
+      { _id: competitionDayId },
+      { $push: { heatList: newHeat } },
+      { new: true }
+    );
   }
 
   async updateHeat({
@@ -260,9 +294,19 @@ export class CompetitionDayService {
     driver2Id: string;
   }): Promise<ICompetitionDayItem | null> {
     const [driver1, driver2] = await Promise.all([
-      driver1Id ? driverService.findById(driver1Id): null,
-      driver2Id ? driverService.findById(driver2Id): null,
+      driver1Id ? driverService.findById(driver1Id) : null,
+      driver2Id ? driverService.findById(driver2Id) : null,
     ]);
+
+    if (!heatId) {
+      return await this.createNewHeat({
+        competitionDayId,
+        bracketNumber,
+        heatType,
+        driver1Id,
+        driver2Id,
+      });
+    }
 
     // if (!driver1 || !driver2) return null;
 
@@ -292,12 +336,12 @@ export class CompetitionDayService {
           { "heatElem._id": heatId }, // Match heatList element by _id
         ],
         new: true,
-      },
+      }
     );
   }
 
   async handleUpdateHeat(
-    req: Request,
+    req: Request
   ): Promise<{ error?: string; success: ICompetitionDayItem | null }> {
     const {
       competitionDayId,
