@@ -55,12 +55,67 @@ export class QualifyingShowdownComputedUtil {
     } as IQualifyingShowdownComputed;
   }
 
+  private computeScoreBoardWithFinalHeat({
+    finalHeat,
+    top1Heat,
+    top2Heat,
+    qualifyingResultList,
+  }: {
+    finalHeat: IComputedShowdownHeat;
+    top1Heat: IComputedShowdownHeat;
+    top2Heat: IComputedShowdownHeat;
+    qualifyingResultList: IQualifyingResultItem[];
+  }): IScoreBoardItem[] {
+    const { loser: top1Loser } = this.getWinnerAndLoserOfHeat(top1Heat);
+    const { loser: top2Loser } = this.getWinnerAndLoserOfHeat(top2Heat);
+
+    const { winner: finalWinner, loser: finalLoser } =
+      this.getWinnerAndLoserOfHeat(finalHeat);
+
+    const [loserDriverTop3, loserDriverTop4] = this.getLosersInOrder(
+      [top1Loser, top2Loser],
+      qualifyingResultList
+    );
+
+    const scoreBoard = [
+      {
+        driver: finalWinner,
+        placement: 1,
+      },
+      {
+        driver: finalLoser,
+        placement: 2,
+      },
+      {
+        driver: loserDriverTop3,
+        placement: 3,
+      },
+      {
+        driver: loserDriverTop4,
+        placement: 4,
+      },
+    ];
+
+    return scoreBoard;
+  }
+
   private computeScoreBoard(
     heatList: IComputedShowdownHeat[],
     qualifyingResultList: IQualifyingResultItem[]
   ): IScoreBoardItem[] {
     const top1Heat = this.getHeatByNumber(heatList, 1);
     const top2Heat = this.getHeatByNumber(heatList, 2);
+
+    const finalHeat =
+      heatList?.find((heat) => heat?.bracketNumber === 3) || null;
+
+    if (finalHeat)
+      return this.computeScoreBoardWithFinalHeat({
+        finalHeat,
+        top1Heat,
+        top2Heat,
+        qualifyingResultList,
+      });
 
     const { winner: top1Winner, loser: top1Loser } =
       this.getWinnerAndLoserOfHeat(top1Heat);
